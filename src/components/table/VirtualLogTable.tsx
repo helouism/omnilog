@@ -78,7 +78,17 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
   const [filter, setFilter] = useState<FilterState>(INITIAL_FILTER);
   const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const parentRef = useRef<HTMLDivElement>(null);
+
+  function toggleExpand(id: number) {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   function handleSort(col: SortColumn) {
     if (sortColumn === col) {
@@ -174,6 +184,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
       />
 
       <div className="table-header d-flex px-3 py-1 border-bottom border-secondary small" style={{ fontSize: '0.7rem' }}>
+        <span style={{ width: 20, flexShrink: 0 }} />
         {colHeader('ID', 'id', 55)}
         {colHeader('TIMESTAMP', 'timestamp', 155)}
         {colHeader('SEVERITY', 'severity', 80)}
@@ -191,37 +202,61 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
         <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
           {items.map(vRow => {
             const entry = displayEntries[vRow.index];
+            const isExpanded = expandedIds.has(entry.id);
             return (
               <div
                 key={vRow.key}
                 data-index={vRow.index}
                 ref={virtualizer.measureElement}
-                className={`log-row d-flex align-items-center px-3 border-bottom border-secondary border-opacity-25 ${SEVERITY_CLASS[entry.severity]}`}
+                className={`log-row border-bottom border-secondary border-opacity-25 ${SEVERITY_CLASS[entry.severity]}`}
                 style={{
                   position: 'absolute',
                   top: vRow.start,
                   left: 0,
                   right: 0,
-                  height: ROW_HEIGHT,
+                  ...(isExpanded ? { minHeight: ROW_HEIGHT } : { height: ROW_HEIGHT }),
                   fontSize: '0.75rem',
                   fontFamily: 'monospace',
                 }}
               >
-                <span className="text-muted" style={{ width: 55, flexShrink: 0 }}>{entry.id}</span>
-                <span style={{ width: 155, flexShrink: 0 }}>{formatTs(entry.timestamp)}</span>
-                <span style={{ width: 80, flexShrink: 0 }}>
-                  <span className={`badge ${SEVERITY_BADGE[entry.severity]}`} style={{ fontSize: '0.65rem' }}>
-                    {entry.severity}
+                <div className="d-flex align-items-center px-3" style={{ height: ROW_HEIGHT }}>
+                  <button
+                    className="btn btn-link p-0 text-muted d-flex align-items-center"
+                    style={{ width: 20, flexShrink: 0, lineHeight: 1 }}
+                    onClick={() => toggleExpand(entry.id)}
+                    title={isExpanded ? 'Collapse' : 'Expand'}
+                  >
+                    <i className={`bi bi-chevron-${isExpanded ? 'down' : 'right'}`} style={{ fontSize: '0.6rem' }} />
+                  </button>
+                  <span className="text-muted" style={{ width: 55, flexShrink: 0 }}>{entry.id}</span>
+                  <span style={{ width: 155, flexShrink: 0 }}>{formatTs(entry.timestamp)}</span>
+                  <span style={{ width: 80, flexShrink: 0 }}>
+                    <span className={`badge ${SEVERITY_BADGE[entry.severity]}`} style={{ fontSize: '0.65rem' }}>
+                      {entry.severity}
+                    </span>
                   </span>
-                </span>
-                <span className="text-info" style={{ width: 120, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {entry.ip ?? '—'}
-                </span>
-                <span className="text-warning" style={{ width: 65, flexShrink: 0 }}>{entry.method ?? '—'}</span>
-                <span style={{ width: 65, flexShrink: 0 }}>{entry.status ?? '—'}</span>
-                <span className="flex-grow-1 text-truncate opacity-75">
-                  {entry.path ?? entry.message ?? entry.raw.slice(0, 200)}
-                </span>
+                  <span className="text-info" style={{ width: 120, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {entry.ip ?? '—'}
+                  </span>
+                  <span className="text-warning" style={{ width: 65, flexShrink: 0 }}>{entry.method ?? '—'}</span>
+                  <span style={{ width: 65, flexShrink: 0 }}>{entry.status ?? '—'}</span>
+                  <span className="flex-grow-1 text-truncate opacity-75">
+                    {entry.path ?? entry.message ?? entry.raw.slice(0, 200)}
+                  </span>
+                </div>
+                {isExpanded && (
+                  <div
+                    className="px-3 pb-2"
+                    style={{ borderTop: '1px solid rgba(48,54,61,0.4)', paddingLeft: '2.75rem' }}
+                  >
+                    <pre
+                      className="mb-0 opacity-75"
+                      style={{ fontSize: '0.7rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'inherit' }}
+                    >
+                      {entry.raw}
+                    </pre>
+                  </div>
+                )}
               </div>
             );
           })}
