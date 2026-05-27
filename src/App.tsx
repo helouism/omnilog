@@ -219,7 +219,7 @@ export default function App() {
                         <span className="text-muted small">
                           <span className="text-light fw-semibold">{filteredAgg.totalLines.toLocaleString()}</span>
                           {' / '}
-                          {state.aggregation.totalLines.toLocaleString()} entries
+                          {state.aggregation?.totalLines.toLocaleString()} entries
                         </span>
                       </>
                     )}
