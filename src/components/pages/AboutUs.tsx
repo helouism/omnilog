@@ -68,15 +68,6 @@ export function AboutUs({ onBack }: Props) {
             </tbody>
           </table>
         </div>
-
-
-        <div className="card border-secondary p-4" style={{ background: '#161b22' }}>
-          <p className="text-muted small mb-0">
-            <i className="bi bi-info-circle me-2" />
-            OmniLog is free and open-source software. Contributions, bug reports, and feature requests are welcome on GitHub.
-          </p>
-        </div>
-
       </div>
     </div>
   );
