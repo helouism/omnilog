@@ -23,19 +23,6 @@ export function PrivacyPolicy({ onBack }: Props) {
           <span className="text-muted small">Last updated: May 2026</span>
         </div>
 
-        <div className="card border-success mb-5 p-4" style={{ background: '#0f2a1a' }}>
-          <div className="d-flex gap-3 align-items-start">
-            <i className="bi bi-shield-check-fill text-success mt-1" style={{ fontSize: '1.5rem', flexShrink: 0 }} />
-            <div>
-              <div className="fw-semibold text-success mb-1">Your data never leaves your device</div>
-              <div className="text-muted small">
-                OmniLog processes all log files locally in your browser. No data is ever transmitted to any server.
-                There are no analytics, no tracking, and no external connections of any kind.
-              </div>
-            </div>
-          </div>
-        </div>
-
         <Section title="1. Information We Collect">
           <p>We collect <strong className="text-light">no information whatsoever</strong>.</p>
           <p>
