@@ -108,7 +108,8 @@ export function PrivacyPolicy({ onBack }: Props) {
 
         <Section title="7. Contact">
           <p>
-            If you have questions about this privacy policy, you can reach us via the GitHub repository.
+            If you have questions about this privacy policy, you can reach us by email at{' '}
+            <a href="mailto:hendrikmahdi@gmail.com" className="text-info">hendrikmahdi@gmail.com</a>.
           </p>
         </Section>
 
