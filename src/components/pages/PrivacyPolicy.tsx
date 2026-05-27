@@ -48,7 +48,6 @@ export function PrivacyPolicy({ onBack }: Props) {
           </p>
           <ul>
             <li><strong className="text-light">IndexedDB</strong> — stores parsed aggregation results locally so sessions persist across browser restarts. Data is stored only on your device.</li>
-            <li><strong className="text-light">Service Worker Cache</strong> — caches the application shell for fast loading. No user data is cached.</li>
           </ul>
         </Section>
 

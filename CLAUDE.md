@@ -117,6 +117,3 @@ Key interfaces in `src/types/log.types.ts`:
 - Custom classes: `.dropzone-area`, `.dropzone-active`, `.log-row`, `.text-purple`, `.bg-purple`, `.btn-xs`
 - No `dangerouslySetInnerHTML` anywhere — XSS prevention
 
-## PWA
-
-Configured via `vite-plugin-pwa` with Workbox. Service Worker uses Cache-First for all app shell assets. `registerType: 'prompt'` — user is shown an "Update available" prompt on new deployments.

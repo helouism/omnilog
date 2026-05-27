@@ -6,8 +6,10 @@
 
     <!-- Primary Meta -->
     <title>OmniLog Analytics Engine</title>
-    <meta name="description" content="High-performance, privacy-first log analytics that runs 100% in your browser. Parse NGINX, Apache, UFW &amp; Syslog files up to 100 GB — zero uploads, zero telemetry." />
-    <meta name="keywords" content="log analytics, nginx log parser, apache log parser, syslog, ufw, privacy, browser, PWA, devops" />
+    <meta
+      name="description"
+      content="High-performance, privacy-first log analytics that runs 100% in your browser. Parse NGINX, Apache, UFW &amp; Syslog files up to 100 GB — zero uploads, zero telemetry."
+    />
     <meta name="author" content="OmniLog" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0d1117" />
@@ -19,57 +21,71 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="OmniLog" />
     <meta property="og:title" content="OmniLog Analytics Engine" />
-    <meta property="og:description" content="High-performance, privacy-first log analytics that runs 100% in your browser. Parse NGINX, Apache, UFW &amp; Syslog files up to 100 GB — zero uploads, zero telemetry." />
+    <meta
+      property="og:description"
+      content="High-performance, privacy-first log analytics that runs 100% in your browser. Parse NGINX, Apache, UFW &amp; Syslog files up to 100 GB — zero uploads, zero telemetry."
+    />
     <meta property="og:url" content="https://omnilog.my.id/" />
     <meta property="og:image" content="https://omnilog.my.id/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="OmniLog — Privacy-first log analytics in the browser" />
+    <meta
+      property="og:image:alt"
+      content="OmniLog — Privacy-first log analytics in the browser"
+    />
     <meta property="og:locale" content="en_US" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="OmniLog Analytics Engine" />
-    <meta name="twitter:description" content="High-performance, privacy-first log analytics that runs 100% in your browser. Parse NGINX, Apache, UFW &amp; Syslog files up to 100 GB — zero uploads, zero telemetry." />
+    <meta
+      name="twitter:description"
+      content="High-performance, privacy-first log analytics that runs 100% in your browser. Parse NGINX, Apache, UFW &amp; Syslog files up to 100 GB — zero uploads, zero telemetry."
+    />
     <meta name="twitter:image" content="https://omnilog.my.id/og-image.png" />
-    <meta name="twitter:image:alt" content="OmniLog — Privacy-first log analytics in the browser" />
+    <meta
+      name="twitter:image:alt"
+      content="OmniLog — Privacy-first log analytics in the browser"
+    />
 
     <!-- Google AdSense-->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4857250752888918"
-     crossorigin="anonymous"></script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4857250752888918"
+      crossorigin="anonymous"
+    ></script>
 
-    <!-- PWA & Icons -->
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
 
     <!-- Structured Data -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "OmniLog Analytics Engine",
-      "description": "High-performance, privacy-first log analytics that runs 100% in your browser. Parse NGINX, Apache, UFW & Syslog files up to 100 GB — zero uploads, zero telemetry.",
-      "url": "https://omnilog.my.id/",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Any",
-      "browserRequirements": "Requires a modern browser with Web Workers and IndexedDB support",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "featureList": [
-        "Zero-egress — no data leaves your device",
-        "Multi-format auto-detection (NGINX, Apache, UFW, Syslog)",
-        "Streaming Web Worker pipeline for 100 GB+ files",
-        "Progressive Web App — installable",
-        "Virtual log table with full-text search and regex",
-        "CSV export"
-      ]
-    }
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "OmniLog Analytics Engine",
+        "description": "High-performance, privacy-first log analytics that runs 100% in your browser. Parse NGINX, Apache, UFW & Syslog files up to 100 GB — zero uploads, zero telemetry.",
+        "url": "https://omnilog.my.id/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires a modern browser with Web Workers and IndexedDB support",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Zero-egress — no data leaves your device",
+          "Multi-format auto-detection (NGINX, Apache, UFW, Syslog)",
+          "Streaming Web Worker pipeline for 100 GB+ files",
+          "Virtual log table with full-text search and regex",
+          "CSV export"
+        ]
+      }
     </script>
   </head>
-  <body style="margin:0;background:#0d1117;overflow:hidden;">
+  <body style="margin: 0; background: #0d1117; overflow: hidden">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
