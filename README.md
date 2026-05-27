@@ -6,7 +6,7 @@ Privacy-first log analytics that runs **100% in your browser**. Parse and visual
 
 ## Features
 
-- **Zero-egress** — no data ever leaves your machine. CSP enforces `connect-src 'none'` in production.
+- **Zero-egress** — log data never leaves your machine. CSP enforces strict `script-src` and `connect-src` in production; outbound connections are limited to Cloudflare Analytics and Google AdSense.
 - **Multi-format detection** — auto-detects NGINX, Apache, UFW, Syslog, and generic log formats using confidence scoring.
 - **Streaming Web Worker** — files are read in 50 MB chunks on a background thread, keeping the UI at 60 FPS regardless of file size.
 - **Live dashboard** — request/error trend, HTTP status distribution, top 10 source IPs, severity breakdown, and stat cards — all update progressively as the file is parsed.
