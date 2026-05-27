@@ -69,12 +69,6 @@ export function AboutUs({ onBack }: Props) {
           </table>
         </div>
 
-        <h5 className="fw-semibold mb-3 text-secondary">Tech Stack</h5>
-        <div className="d-flex flex-wrap gap-2 mb-5">
-          {['React 18', 'TypeScript', 'Vite', 'Chart.js', 'TanStack Virtual', 'Bootstrap 5.3', 'Workbox PWA', 'IndexedDB'].map(t => (
-            <span key={t} className="badge border border-secondary text-secondary fw-normal px-3 py-2">{t}</span>
-          ))}
-        </div>
 
         <div className="card border-secondary p-4" style={{ background: '#161b22' }}>
           <p className="text-muted small mb-0">
