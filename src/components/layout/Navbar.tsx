@@ -1,8 +1,11 @@
 import type { AnalyticsState } from '../../hooks/useLogAnalytics';
 
+export type AppPage = 'app' | 'about' | 'privacy' | 'terms';
+
 interface NavbarProps {
   state: AnalyticsState;
   onReset: () => void;
+  onNavigate: (page: AppPage) => void;
 }
 
 const FORMAT_BADGE_COLOR: Record<string, string> = {
@@ -21,7 +24,13 @@ function formatBytes(bytes: number): string {
   return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
 }
 
-export function Navbar({ state, onReset }: NavbarProps) {
+const NAV_LINKS: { label: string; page: AppPage }[] = [
+  { label: 'About', page: 'about' },
+  { label: 'Privacy', page: 'privacy' },
+  { label: 'Terms', page: 'terms' },
+];
+
+export function Navbar({ state, onReset, onNavigate }: NavbarProps) {
   const isActive = state.status !== 'idle';
 
   return (
@@ -44,7 +53,20 @@ export function Navbar({ state, onReset }: NavbarProps) {
         )}
       </div>
 
-      <div className="d-flex align-items-center gap-2">
+      <div className="d-flex align-items-center gap-3">
+        <div className="d-flex gap-3">
+          {NAV_LINKS.map(({ label, page }) => (
+            <button
+              key={page}
+              className="btn btn-link text-muted p-0 text-decoration-none"
+              style={{ fontSize: '0.8rem' }}
+              onClick={() => onNavigate(page)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {isActive && state.format !== 'unknown' && (
           <span className={`badge bg-${FORMAT_BADGE_COLOR[state.format] ?? 'secondary'}`}>
             <i className="bi bi-braces me-1" />

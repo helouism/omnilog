@@ -1,11 +1,15 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Navbar } from './components/layout/Navbar';
+import type { AppPage } from './components/layout/Navbar';
 import { Dropzone } from './components/uploader/Dropzone';
 import { ProgressBar } from './components/dashboard/ProgressBar';
 import { StatCards } from './components/dashboard/StatCards';
 import { TimeSeriesChart, TopIPsChart, StatusDistributionChart, SeverityChart } from './components/dashboard/Charts';
 import { VirtualLogTable } from './components/table/VirtualLogTable';
 import { useLogAnalytics } from './hooks/useLogAnalytics';
+import { AboutUs } from './components/pages/AboutUs';
+import { PrivacyPolicy } from './components/pages/PrivacyPolicy';
+import { TermsAndConditions } from './components/pages/TermsAndConditions';
 import type { AggregationResult, LogEntry, SeverityLevel } from './types/log.types';
 
 type ActiveTab = 'dashboard' | 'table';
@@ -66,6 +70,7 @@ function reAggregate(entries: LogEntry[], base: AggregationResult): AggregationR
 export default function App() {
   const { state, processFile, reset } = useLogAnalytics();
   const [tab, setTab] = useState<ActiveTab>('dashboard');
+  const [page, setPage] = useState<AppPage>('app');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [appliedFrom, setAppliedFrom] = useState('');
@@ -125,9 +130,13 @@ export default function App() {
   const isFiltered = !!(appliedFrom || appliedTo);
   const isDirty = dateFrom !== appliedFrom || dateTo !== appliedTo;
 
+  if (page === 'about') return <AboutUs onBack={() => setPage('app')} />;
+  if (page === 'privacy') return <PrivacyPolicy onBack={() => setPage('app')} />;
+  if (page === 'terms') return <TermsAndConditions onBack={() => setPage('app')} />;
+
   return (
     <div className="d-flex flex-column h-100 bg-dark text-white" style={{ background: '#0d1117' }}>
-      <Navbar state={state} onReset={reset} />
+      <Navbar state={state} onReset={reset} onNavigate={setPage} />
 
       {(state.status === 'parsing' || state.status === 'sniffing') && (
         <ProgressBar state={state} />
