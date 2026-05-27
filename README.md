@@ -1,73 +1,80 @@
-# React + TypeScript + Vite
+# OmniLog
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Privacy-first log analytics that runs **100% in your browser**. Parse and visualize NGINX, Apache, UFW & Syslog files up to 100 GB — zero uploads, zero telemetry.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Zero-egress** — no data ever leaves your machine. CSP enforces `connect-src 'none'` in production.
+- **Multi-format detection** — auto-detects NGINX, Apache, UFW, Syslog, and generic log formats using confidence scoring.
+- **Streaming Web Worker** — files are read in 50 MB chunks on a background thread, keeping the UI at 60 FPS regardless of file size.
+- **Live dashboard** — request/error trend, HTTP status distribution, top 10 source IPs, severity breakdown, and stat cards — all update progressively as the file is parsed.
+- **Global date filter** — filter the entire dashboard (all charts + stat cards) by a custom time range, applied on demand.
+- **Virtual log table** — renders millions of rows without DOM overhead via `@tanstack/react-virtual`. Supports full-text search, regex, severity filter, and sortable columns.
+- **CSV export** — export filtered & sorted log entries to CSV in one click.
+- **PWA** — installable, works offline, prompts on new deployments.
+- **IndexedDB session persistence** — last parsed file is restored on page reload.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Supported Formats
 
-## Expanding the ESLint configuration
+| Format | Detection signature |
+|---|---|
+| NGINX | Combined Log Format |
+| Apache | Common Log + ErrorLog prefix |
+| UFW | `[UFW BLOCK/ALLOW]` prefix |
+| Syslog | RFC 3164 / 5424 PRI header |
+| Generic | Heuristic timestamp + severity + IP |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev       # http://localhost:5173
+npm run build     # production build
+npm run preview   # preview production build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+TypeScript check:
+```bash
+npx tsc --noEmit
 ```
+
+## Tech Stack
+
+| Layer | Library |
+|---|---|
+| UI | React 19, Bootstrap 5.3 (SCSS) |
+| Charts | Chart.js 4, react-chartjs-2 |
+| Virtual list | @tanstack/react-virtual |
+| Bundler | Vite 8 |
+| Language | TypeScript 6 |
+| PWA | vite-plugin-pwa + Workbox |
+| Storage | IndexedDB via `idb` |
+
+## Architecture
+
+```
+File drop → useLogAnalytics hook → Web Worker
+  → sniff (1 MB sample) → detect format + confidence
+  → chunk loop (50 MB) → parse line-by-line
+  → every 5 chunks → postMessage partial aggregation
+  → done → postMessage full AggregationResult
+  → React state → charts re-render
+  → IndexedDB → session persisted
+```
+
+**Main thread** handles only UI — rendering charts from aggregated data emitted by the Worker. Raw log strings are discarded from Worker memory after each chunk; only numbers, timestamps, and IPs cross to the main thread.
+
+**Global date filter** re-aggregates all metrics from `entries[]` on the main thread via `useMemo` — a single O(n) pass, applied only on explicit user action (Enter or Apply button).
+
+## Privacy
+
+- No `fetch`, `axios`, or `XMLHttpRequest` anywhere in the codebase
+- No CDN dependencies — all assets are bundled locally
+- No analytics, error reporting, or telemetry
+- Service Worker uses Cache-First for all app shell assets
+
+## License
+
+MIT
