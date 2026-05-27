@@ -27,7 +27,7 @@ export function AboutUs({ onBack }: Props) {
             { icon: 'bi-shield-lock-fill', color: 'text-success', title: 'Zero Egress', body: 'Your log files never leave your device. No uploads, no servers, no third-party services. The app ships with a strict Content Security Policy that blocks all outbound connections.' },
             { icon: 'bi-cpu-fill', color: 'text-primary', title: 'Web Worker Pipeline', body: 'Heavy parsing runs in a background Web Worker, keeping the UI at 60 FPS even for 100 GB+ files. Data is streamed in 50 MB chunks and aggregated progressively.' },
             { icon: 'bi-file-earmark-text-fill', color: 'text-warning', title: 'Multi-Format Support', body: 'Built-in parsers for NGINX, Apache, UFW, Syslog, and a generic heuristic fallback. Format is auto-detected by confidence scoring on the first 1 MB of the file.' },
-            { icon: 'bi-wifi-off', color: 'text-info', title: 'Works Offline', body: 'Installed as a Progressive Web App (PWA) via a Workbox service worker. Runs fully offline after the first load with automatic background update prompts.' },
+            { icon: 'bi-phone-fill', color: 'text-info', title: 'Installable PWA', body: 'Install OmniLog as a Progressive Web App on any device. Runs directly from your home screen with automatic update prompts on new deployments.' },
           ].map(f => (
             <div className="col-12 col-sm-6" key={f.title}>
               <div className="card h-100 border-secondary" style={{ background: '#161b22' }}>

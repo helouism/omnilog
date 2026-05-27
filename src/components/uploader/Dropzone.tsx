@@ -100,7 +100,7 @@ export function Dropzone({ onFile }: DropzoneProps) {
         {[
           { icon: 'bi-lightning-charge-fill', label: 'Auto-detect format', color: 'text-warning' },
           { icon: 'bi-cpu-fill', label: 'Web Worker processing', color: 'text-info' },
-          { icon: 'bi-wifi-off', label: 'Works offline (PWA)', color: 'text-success' },
+          { icon: 'bi-cloud-slash-fill', label: 'Zero uploads', color: 'text-success' },
         ].map(({ icon, label, color }) => (
           <div key={label} className="d-flex flex-column align-items-center gap-1">
             <i className={`bi ${icon} ${color} fs-5`} />

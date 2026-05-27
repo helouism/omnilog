@@ -13,7 +13,7 @@ Privacy-first log analytics that runs **100% in your browser**. Parse and visual
 - **Global date filter** — filter the entire dashboard (all charts + stat cards) by a custom time range, applied on demand.
 - **Virtual log table** — renders millions of rows without DOM overhead via `@tanstack/react-virtual`. Supports full-text search, regex, severity filter, and sortable columns.
 - **CSV export** — export filtered & sorted log entries to CSV in one click.
-- **PWA** — installable, works offline, prompts on new deployments.
+- **PWA** — installable, prompts on new deployments.
 - **IndexedDB session persistence** — last parsed file is restored on page reload.
 
 ## Supported Formats
