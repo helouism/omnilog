@@ -66,19 +66,30 @@ export function PrivacyPolicy({ onBack }: Props) {
         </Section>
 
         <Section title="4. Third-Party Services">
+          <p>OmniLog uses two third-party services. Neither has access to the contents of your log files.</p>
+
+          <p><strong className="text-light">Cloudflare Web Analytics</strong></p>
           <p>
-            OmniLog uses <strong className="text-light">no third-party services</strong>. This includes:
+            We use Cloudflare Web Analytics to understand aggregate traffic patterns. It collects:
+            page views, unique visitor counts, country of origin, referring URL, browser, and device type.
+            It does <strong className="text-light">not</strong> use cookies, does not track individuals across sites,
+            and does not collect personal data. Data is processed by Cloudflare in accordance with their{' '}
+            <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer" className="text-info">Privacy Policy</a>.
           </p>
-          <ul>
-            <li>No analytics (Google Analytics, Mixpanel, Plausible, etc.)</li>
-            <li>No error reporting (Sentry, Bugsnag, etc.)</li>
-            <li>No CDN-loaded scripts or stylesheets</li>
-            <li>No advertising networks</li>
-            <li>No social media widgets</li>
-          </ul>
+
+          <p><strong className="text-light">Google AdSense</strong></p>
           <p>
-            The application is shipped with a Content Security Policy of <code className="text-info">connect-src 'none'</code>,
-            which instructs the browser to block all outbound network connections at the network layer.
+            We display advertisements served by Google AdSense. Google may use cookies and similar technologies
+            to show personalised ads based on your browsing activity. You can opt out or manage your ad preferences
+            via{' '}
+            <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-info">Google Ad Settings</a>.
+            Google's data practices are governed by the{' '}
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-info">Google Privacy Policy</a>.
+          </p>
+
+          <p>
+            No other third-party services are used. There is no error reporting, no social media widgets,
+            and no other advertising networks.
           </p>
         </Section>
 

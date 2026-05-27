@@ -70,10 +70,11 @@ File drop → useLogAnalytics hook → Web Worker
 
 ## Privacy
 
-- No `fetch`, `axios`, or `XMLHttpRequest` anywhere in the codebase
-- No CDN dependencies — all assets are bundled locally
-- No analytics, error reporting, or telemetry
+- No `fetch`, `axios`, or `XMLHttpRequest` in application code — log data never leaves the browser
+- All app assets are bundled locally; no CDN dependencies for the app shell
 - Service Worker uses Cache-First for all app shell assets
+- **Cloudflare Web Analytics** — cookieless, aggregate traffic metrics only (page views, country, browser). No personal data collected.
+- **Google AdSense** — serves display ads; may use cookies for ad personalisation per [Google's Privacy Policy](https://policies.google.com/privacy)
 
 ## License
 

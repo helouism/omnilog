@@ -55,11 +55,14 @@ File drop → useLogAnalytics hook → new Worker()
 
 ## Key Constraints
 
-### Zero-Egress (Non-Negotiable)
-- **Never** add `fetch`, `axios`, `XMLHttpRequest`, or any network call
-- **Never** add CDN `<link>` or `<script>` tags in `index.html`
-- **Never** add analytics, error reporting (Sentry, etc.), or telemetry
-- CSP in production: `connect-src 'none'`
+### Zero-Egress (Log Data)
+- **Never** add `fetch`, `axios`, `XMLHttpRequest`, or any network call that touches log data
+- **Never** add error reporting (Sentry, etc.) or additional telemetry beyond what is listed below
+- CSP is enforced via `public/_headers` (Cloudflare Workers Assets)
+
+**Permitted third-party scripts (already configured in CSP and `index.html`):**
+- `static.cloudflareinsights.com` — Cloudflare Web Analytics (auto-injected by Cloudflare, no code needed)
+- `pagead2.googlesyndication.com` — Google AdSense (`index.html` script tag, publisher ID must be set)
 
 ### Memory Budget
 - Tab RAM must stay ≤ 500 MB regardless of file size
