@@ -10,7 +10,7 @@ export function AboutUs({ onBack }: Props) {
         </button>
 
         <div className="d-flex align-items-center gap-3 mb-4">
-          <i className="bi bi-activity text-primary" style={{ fontSize: '2rem' }} />
+          <img src="/favicon.svg" alt="" width={40} height={38} style={{ display: 'block' }} />
           <div>
             <h1 className="fw-bold mb-0" style={{ fontSize: '1.75rem' }}>OmniLog</h1>
             <span className="text-muted small">Analytics Engine</span>
