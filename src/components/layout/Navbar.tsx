@@ -42,7 +42,7 @@ export function Navbar({ state, onReset, onNavigate }: NavbarProps) {
           onClick={onReset}
           title="Back to home"
         >
-          <i className="bi bi-activity text-primary fs-5" />
+          <img src="/favicon.svg" alt="" width={22} height={21} style={{ display: 'block' }} />
           OmniLog
         </span>
         {isActive && state.fileName && (
