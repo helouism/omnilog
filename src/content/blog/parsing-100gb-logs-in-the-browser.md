@@ -127,5 +127,3 @@ WebAssembly also adds significant bundle size and build complexity for a margina
 ## Try It Yourself
 
 Drop any NGINX, Apache, UFW, or Syslog file onto [OmniLog](/) — or a plain text log with timestamps and severity levels. Files up to 100 GB work fine. Nothing leaves your browser.
-
-The entire codebase is open and readable. If you're curious about the parser implementations, the Worker message protocol, or how IndexedDB session persistence works, [the source is on GitHub](https://github.com/blegasul/omnilog).
