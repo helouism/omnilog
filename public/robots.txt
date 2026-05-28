@@ -1,4 +1,1 @@
-User-agent: *
-Allow: /
-
 Sitemap: https://omnilog.my.id/sitemap.xml
