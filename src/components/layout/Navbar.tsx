@@ -1,11 +1,9 @@
+import { Link, useNavigate } from 'react-router-dom';
 import type { AnalyticsState } from '../../hooks/useLogAnalytics';
-
-export type AppPage = 'app' | 'about' | 'privacy' | 'terms';
 
 interface NavbarProps {
   state: AnalyticsState;
   onReset: () => void;
-  onNavigate: (page: AppPage) => void;
 }
 
 const FORMAT_BADGE_COLOR: Record<string, string> = {
@@ -24,14 +22,20 @@ function formatBytes(bytes: number): string {
   return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
 }
 
-const NAV_LINKS: { label: string; page: AppPage }[] = [
-  { label: 'About', page: 'about' },
-  { label: 'Privacy', page: 'privacy' },
-  { label: 'Terms', page: 'terms' },
+const NAV_LINKS = [
+  { label: 'Blog', to: '/blog' },
+  { label: 'About', to: '/about' },
+  { label: 'Privacy', to: '/privacy' },
+  { label: 'Terms', to: '/terms' },
 ];
 
-export function Navbar({ state, onReset, onNavigate }: NavbarProps) {
+export function Navbar({ state, onReset }: NavbarProps) {
+  const navigate = useNavigate();
   const isActive = state.status !== 'idle';
+
+  function handleLogo() {
+    navigate('/');
+  }
 
   return (
     <nav className="navbar navbar-dark bg-dark border-bottom border-secondary px-3 py-2">
@@ -39,7 +43,7 @@ export function Navbar({ state, onReset, onNavigate }: NavbarProps) {
         <span
           className="navbar-brand mb-0 fw-bold text-white d-flex align-items-center gap-2"
           style={{ cursor: 'pointer' }}
-          onClick={onReset}
+          onClick={handleLogo}
           title="Back to home"
         >
           <img src="/favicon.svg" alt="" width={22} height={21} style={{ display: 'block' }} />
@@ -55,15 +59,15 @@ export function Navbar({ state, onReset, onNavigate }: NavbarProps) {
 
       <div className="d-flex align-items-center gap-3">
         <div className="d-flex gap-3">
-          {NAV_LINKS.map(({ label, page }) => (
-            <button
-              key={page}
-              className="btn btn-link text-muted p-0 text-decoration-none"
+          {NAV_LINKS.map(({ label, to }) => (
+            <Link
+              key={to}
+              to={to}
+              className="text-muted text-decoration-none"
               style={{ fontSize: '0.8rem' }}
-              onClick={() => onNavigate(page)}
             >
               {label}
-            </button>
+            </Link>
           ))}
         </div>
 

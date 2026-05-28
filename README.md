@@ -14,6 +14,7 @@ Privacy-first log analytics that runs **100% in your browser**. Parse and visual
 - **Virtual log table** — renders millions of rows without DOM overhead via `@tanstack/react-virtual`. Supports full-text search, regex, severity filter, and sortable columns.
 - **CSV export** — export filtered & sorted log entries to CSV in one click.
 - **IndexedDB session persistence** — last parsed file is restored on page reload.
+- **Blog** — static markdown-based blog at `/blog`; posts are bundled at build time via `import.meta.glob`, rendered with `react-markdown` + `remark-gfm`.
 
 ## Supported Formats
 
@@ -44,8 +45,10 @@ npx tsc --noEmit
 | Layer | Library |
 |---|---|
 | UI | React 19, Bootstrap 5.3 (SCSS) |
+| Routing | React Router v6 |
 | Charts | Chart.js 4, react-chartjs-2 |
 | Virtual list | @tanstack/react-virtual |
+| Blog | react-markdown, remark-gfm |
 | Bundler | Vite 8 |
 | Language | TypeScript 6 |
 | PWA | vite-plugin-pwa + Workbox |

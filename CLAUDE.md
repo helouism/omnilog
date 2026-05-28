@@ -78,18 +78,60 @@ File drop → useLogAnalytics hook → new Worker()
 ```
 src/
 ├── types/log.types.ts          — All TypeScript interfaces
+├── content/
+│   ├── posts.ts                — Blog post registry + getPostContent() loader
+│   └── blog/
+│       └── *.md                — One markdown file per blog post (no frontmatter)
 ├── core/
 │   ├── parsers/                — One file per log format
 │   ├── workers/logProcessor.worker.ts
 │   └── idbStorage.ts           — IndexedDB CRUD
 ├── hooks/useLogAnalytics.ts    — Worker ↔ React state bridge
 ├── components/
-│   ├── layout/                 — Navbar
+│   ├── layout/                 — Navbar (uses react-router-dom Link/useNavigate)
 │   ├── uploader/               — Dropzone
 │   ├── dashboard/              — Charts, StatCards, ProgressBar
-│   └── table/                  — VirtualLogTable, FilterBar
-└── assets/main.scss            — Bootstrap 5.3 dark theme (base: #0d1117)
+│   ├── table/                  — VirtualLogTable, FilterBar
+│   └── pages/
+│       ├── MainPage.tsx        — Main analytics UI (extracted from App.tsx)
+│       ├── BlogList.tsx        — /blog route
+│       ├── BlogPost.tsx        — /blog/:slug route
+│       ├── AboutUs.tsx
+│       ├── PrivacyPolicy.tsx
+│       └── TermsAndConditions.tsx
+└── assets/main.scss            — Bootstrap 5.3 dark theme + .blog-content styles
 ```
+
+## Routing
+
+React Router v6 (`BrowserRouter` in `main.tsx`, `Routes`/`Route` in `App.tsx`). Cloudflare Workers Assets handles SPA fallback via `"not_found_handling": "single-page-application"` in `wrangler.jsonc` — no `_redirects` file needed.
+
+| Route | Component |
+|---|---|
+| `/` | `MainPage` — analytics UI |
+| `/blog` | `BlogList` — post index |
+| `/blog/:slug` | `BlogPost` — rendered markdown |
+| `/about` | `AboutUs` |
+| `/privacy` | `PrivacyPolicy` |
+| `/terms` | `TermsAndConditions` |
+
+The Navbar is rendered outside `<Routes>` so it persists on all pages. Analytics state (`useLogAnalytics`) lives in `App.tsx` and is passed as props to `MainPage` and `Navbar`.
+
+## Adding a Blog Post
+
+1. Create `src/content/blog/<slug>.md` — plain markdown, no frontmatter.
+2. Add an entry to the `POSTS` array in `src/content/posts.ts`:
+   ```ts
+   {
+     slug: '<slug>',          // must match the filename
+     title: '...',
+     date: 'YYYY-MM-DD',
+     description: '...',
+     readingTime: 'N min read',
+     tags: ['...'],
+   }
+   ```
+3. `import.meta.glob` picks up the new file automatically at build time — no other changes needed.
 
 ## Adding a New Parser
 

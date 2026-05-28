@@ -1,6 +1,7 @@
-interface Props { onBack: () => void }
+import { useNavigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="mb-5">
       <h5 className="fw-semibold mb-3" style={{ color: '#e6edf3' }}>{title}</h5>
@@ -9,12 +10,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export function TermsAndConditions({ onBack }: Props) {
+export function TermsAndConditions() {
+  const navigate = useNavigate();
   return (
-    <div className="d-flex flex-column h-100 overflow-auto" style={{ background: '#0d1117', color: '#e6edf3' }}>
+    <div className="flex-grow-1 overflow-auto" style={{ background: '#0d1117', color: '#e6edf3' }}>
       <div className="container py-5" style={{ maxWidth: 760 }}>
 
-        <button className="btn btn-sm btn-outline-secondary mb-4" onClick={onBack}>
+        <button className="btn btn-sm btn-outline-secondary mb-4" onClick={() => navigate(-1)}>
           <i className="bi bi-arrow-left me-2" />Back
         </button>
 
