@@ -132,6 +132,7 @@ The Navbar is rendered outside `<Routes>` so it persists on all pages. Analytics
    }
    ```
 3. `import.meta.glob` picks up the new file automatically at build time — no other changes needed.
+4. Add a `<url>` entry to `public/sitemap.xml` with the full URL `https://omnilog.my.id/blog/<slug>`, today's date as `lastmod`, `changefreq: monthly`, and `priority: 0.7`. Also update the `<lastmod>` on the `/blog` index entry to today's date.
 
 ## Adding a New Parser
 
