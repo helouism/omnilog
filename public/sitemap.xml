@@ -8,9 +8,15 @@
   </url>
   <url>
     <loc>https://omnilog.my.id/blog</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2026-06-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://omnilog.my.id/blog/linux-log-files-guide</loc>
+    <lastmod>2026-06-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://omnilog.my.id/blog/parsing-100gb-logs-in-the-browser</loc>

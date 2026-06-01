@@ -9,6 +9,15 @@ export interface PostMeta {
 
 export const POSTS: PostMeta[] = [
   {
+    slug: 'linux-log-files-guide',
+    title: 'Linux Log Files Explained: syslog, kern.log, auth.log and Everything in Between',
+    date: '2026-06-01',
+    description:
+      'A practical guide to every major log file under /var/log — what each one contains, how syslog routing and journald work, and the commands you need to diagnose real problems.',
+    readingTime: '9 min read',
+    tags: ['linux', 'syslog', 'devops', 'security'],
+  },
+  {
     slug: 'parsing-100gb-logs-in-the-browser',
     title: 'How OmniLog Parses 100 GB Log Files Entirely in Your Browser',
     date: '2025-06-01',
