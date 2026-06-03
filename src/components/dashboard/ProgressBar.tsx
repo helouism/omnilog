@@ -46,7 +46,12 @@ export function ProgressBar({ state }: ProgressBarProps) {
       <div className="progress" style={{ height: 6 }}>
         <div
           className={`progress-bar ${isSniffing ? 'progress-bar-striped progress-bar-animated' : ''} bg-primary`}
-          style={{ width: isSniffing ? '100%' : `${state.progress}%`, transition: 'width 0.3s ease' }}
+          style={{
+            width: '100%',
+            transformOrigin: 'left',
+            transform: `scaleX(${isSniffing ? 1 : state.progress / 100})`,
+            transition: 'transform 0.3s ease',
+          }}
         />
       </div>
     </div>

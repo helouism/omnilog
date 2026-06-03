@@ -15,7 +15,7 @@ export default function App() {
     <div className="d-flex flex-column h-100 bg-dark text-white" style={{ background: '#0d1117' }}>
       <Navbar state={state} onReset={reset} />
       <Routes>
-        <Route path="/" element={<MainPage state={state} processFile={processFile} reset={reset} />} />
+        <Route path="/" element={<MainPage key={state.fileName ?? ''} state={state} processFile={processFile} reset={reset} />} />
         <Route path="/blog" element={<BlogList />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/about" element={<AboutUs />} />

@@ -10,7 +10,7 @@ function formatDate(iso: string): string {
 }
 
 export function BlogList() {
-  const sorted = [...POSTS].sort((a, b) => b.date.localeCompare(a.date));
+  const sorted = POSTS.toSorted((a, b) => b.date.localeCompare(a.date));
 
   return (
     <div className="flex-grow-1 overflow-auto" style={{ background: '#0d1117' }}>
@@ -55,7 +55,7 @@ export function BlogList() {
                     <span
                       key={tag}
                       className="badge"
-                      style={{ background: '#21262d', color: '#8b949e', fontSize: '0.7rem' }}
+                      style={{ background: '#21262d', color: '#8b949e', fontSize: '0.75rem' }}
                     >
                       {tag}
                     </span>

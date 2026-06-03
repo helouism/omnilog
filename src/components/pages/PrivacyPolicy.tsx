@@ -16,7 +16,7 @@ export function PrivacyPolicy() {
     <div className="flex-grow-1 overflow-auto" style={{ background: '#0d1117', color: '#e6edf3' }}>
       <div className="container py-5" style={{ maxWidth: 760 }}>
 
-        <button className="btn btn-sm btn-outline-secondary mb-4" onClick={() => navigate(-1)}>
+        <button type="button" className="btn btn-sm btn-outline-secondary mb-4" onClick={() => navigate(-1)}>
           <i className="bi bi-arrow-left me-2" />Back
         </button>
 
@@ -37,7 +37,7 @@ export function PrivacyPolicy() {
         <Section title="2. Log File Processing">
           <p>When you drop a log file into OmniLog:</p>
           <ul>
-            <li>The file is read locally by your browser — it is never uploaded to any server.</li>
+            <li>The file is read locally by your browser; it is never uploaded to any server.</li>
             <li>Raw log lines are parsed in a background Web Worker and immediately discarded from memory after each chunk is processed.</li>
             <li>Only aggregated data (counts, timestamps, IP addresses) is retained in memory for display.</li>
             <li>Parsed session data may be stored in your browser's IndexedDB to persist analysis results across page reloads. This storage is local to your device and is never synced or transmitted.</li>
@@ -49,7 +49,7 @@ export function PrivacyPolicy() {
             OmniLog does not set any tracking cookies. The only browser storage used is:
           </p>
           <ul>
-            <li><strong className="text-light">IndexedDB</strong> — stores parsed aggregation results locally so sessions persist across browser restarts. Data is stored only on your device.</li>
+            <li><strong className="text-light">IndexedDB</strong>: stores parsed aggregation results locally so sessions persist across browser restarts. Data is stored only on your device.</li>
           </ul>
         </Section>
 

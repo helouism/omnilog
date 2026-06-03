@@ -1,16 +1,12 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useReducer, lazy, Suspense } from 'react';
 import { Dropzone } from '../uploader/Dropzone';
 import { ProgressBar } from '../dashboard/ProgressBar';
 import { StatCards } from '../dashboard/StatCards';
-import {
-  TimeSeriesChart,
-  TopIPsChart,
-  StatusDistributionChart,
-  SeverityChart,
-} from '../dashboard/Charts';
 import { VirtualLogTable } from '../table/VirtualLogTable';
 import type { AnalyticsState } from '../../hooks/useLogAnalytics';
 import type { AggregationResult, LogEntry, SeverityLevel } from '../../types/log.types';
+
+const LazyChartsGrid = lazy(() => import('../dashboard/Charts'));
 
 type ActiveTab = 'dashboard' | 'table';
 
@@ -39,17 +35,17 @@ function reAggregate(entries: LogEntry[], base: AggregationResult): AggregationR
   }
 
   const timeSeries = [...tsMap.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
+    .toSorted((a, b) => a[0].localeCompare(b[0]))
     .map(([timestamp, v]) => ({ timestamp, ...v }));
 
   const topIPs = [...ipMap.entries()]
-    .sort((a, b) => b[1] - a[1])
+    .toSorted((a, b) => b[1] - a[1])
     .slice(0, 10)
     .map(([ip, count]) => ({ ip, count }));
 
   const statusDistribution = [...statusMap.entries()]
     .map(([status, count]) => ({ status, count }))
-    .sort((a, b) => a.status.localeCompare(b.status));
+    .toSorted((a, b) => a.status.localeCompare(b.status));
 
   const severityDistribution = [...sevMap.entries()]
     .map(([severity, count]) => ({ severity: severity as SeverityLevel, count }));
@@ -73,35 +69,28 @@ interface Props {
   reset: () => void;
 }
 
+type DateFilter = { dateFrom: string; dateTo: string; appliedFrom: string; appliedTo: string };
+type DateAction =
+  | { type: 'setFrom'; v: string }
+  | { type: 'setTo'; v: string }
+  | { type: 'apply' }
+  | { type: 'clear' };
+const INIT_DATE: DateFilter = { dateFrom: '', dateTo: '', appliedFrom: '', appliedTo: '' };
+function dateReducer(s: DateFilter, a: DateAction): DateFilter {
+  switch (a.type) {
+    case 'setFrom': return { ...s, dateFrom: a.v };
+    case 'setTo': return { ...s, dateTo: a.v };
+    case 'apply': return { ...s, appliedFrom: s.dateFrom, appliedTo: s.dateTo };
+    case 'clear': return INIT_DATE;
+  }
+}
+
 export function MainPage({ state, processFile, reset }: Props) {
   const [tab, setTab] = useState<ActiveTab>('dashboard');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  const [appliedFrom, setAppliedFrom] = useState('');
-  const [appliedTo, setAppliedTo] = useState('');
-  const prevFileRef = useRef<string | null>(null);
+  const [df, dispatch] = useReducer(dateReducer, INIT_DATE);
 
-  function applyFilter() {
-    setAppliedFrom(dateFrom);
-    setAppliedTo(dateTo);
-  }
-
-  function clearFilter() {
-    setDateFrom('');
-    setDateTo('');
-    setAppliedFrom('');
-    setAppliedTo('');
-  }
-
-  useEffect(() => {
-    if (state.fileName !== prevFileRef.current) {
-      prevFileRef.current = state.fileName;
-      setDateFrom('');
-      setDateTo('');
-      setAppliedFrom('');
-      setAppliedTo('');
-    }
-  }, [state.fileName]);
+  function applyFilter() { dispatch({ type: 'apply' }); }
+  function clearFilter() { dispatch({ type: 'clear' }); }
 
   const dataDateRange = useMemo(() => {
     const ts = state.aggregation?.timeSeries;
@@ -114,10 +103,10 @@ export function MainPage({ state, processFile, reset }: Props) {
 
   const filteredAgg = useMemo<AggregationResult | null>(() => {
     if (!state.aggregation) return null;
-    if (!appliedFrom && !appliedTo) return state.aggregation;
+    if (!df.appliedFrom && !df.appliedTo) return state.aggregation;
 
-    const from = appliedFrom ? new Date(appliedFrom) : null;
-    const to = appliedTo ? new Date(appliedTo) : null;
+    const from = df.appliedFrom ? new Date(df.appliedFrom) : null;
+    const to = df.appliedTo ? new Date(df.appliedTo) : null;
 
     const filtered = state.aggregation.entries.filter(e => {
       if (!e.timestamp) return false;
@@ -127,12 +116,12 @@ export function MainPage({ state, processFile, reset }: Props) {
     });
 
     return reAggregate(filtered, state.aggregation);
-  }, [state.aggregation, appliedFrom, appliedTo]);
+  }, [state.aggregation, df.appliedFrom, df.appliedTo]);
 
   const hasData = state.aggregation != null;
   const isIdle = state.status === 'idle';
-  const isFiltered = !!(appliedFrom || appliedTo);
-  const isDirty = dateFrom !== appliedFrom || dateTo !== appliedTo;
+  const isFiltered = !!(df.appliedFrom || df.appliedTo);
+  const isDirty = df.dateFrom !== df.appliedFrom || df.dateTo !== df.appliedTo;
 
   return (
     <div className="flex-grow-1 d-flex flex-column overflow-hidden">
@@ -151,6 +140,7 @@ export function MainPage({ state, processFile, reset }: Props) {
               <ul className="nav nav-tabs border-0">
                 <li className="nav-item">
                   <button
+                    type="button"
                     className={`nav-link ${tab === 'dashboard' ? 'active' : ''}`}
                     onClick={() => setTab('dashboard')}
                   >
@@ -159,11 +149,12 @@ export function MainPage({ state, processFile, reset }: Props) {
                 </li>
                 <li className="nav-item">
                   <button
+                    type="button"
                     className={`nav-link ${tab === 'table' ? 'active' : ''}`}
                     onClick={() => setTab('table')}
                   >
                     <i className="bi bi-table me-2" />Log Table
-                    <span className="badge bg-secondary ms-2" style={{ fontSize: '0.65rem' }}>
+                    <span className="badge bg-secondary ms-2" style={{ fontSize: '0.75rem' }}>
                       {state.aggregation?.entries.length.toLocaleString()}
                     </span>
                   </button>
@@ -181,32 +172,35 @@ export function MainPage({ state, processFile, reset }: Props) {
                       <i className="bi bi-funnel me-1" />Filter by date
                     </span>
                     <div className="d-flex align-items-center gap-2">
-                      <label className="text-muted mb-0" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}>From</label>
+                      <label htmlFor="date-from" className="text-muted mb-0" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}>From</label>
                       <input
+                        id="date-from"
                         type="datetime-local"
                         className="form-control form-control-sm border-secondary"
                         style={{ fontSize: '0.75rem', width: 190, background: '#0d1117', color: '#e6edf3', colorScheme: 'dark' }}
-                        value={dateFrom}
+                        value={df.dateFrom}
                         min={dataDateRange.min}
-                        max={dateTo || dataDateRange.max}
-                        onChange={e => setDateFrom(e.target.value)}
+                        max={df.dateTo || dataDateRange.max}
+                        onChange={e => dispatch({ type: 'setFrom', v: e.target.value })}
                         onKeyDown={e => e.key === 'Enter' && applyFilter()}
                       />
                     </div>
                     <div className="d-flex align-items-center gap-2">
-                      <label className="text-muted mb-0" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}>To</label>
+                      <label htmlFor="date-to" className="text-muted mb-0" style={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}>To</label>
                       <input
+                        id="date-to"
                         type="datetime-local"
                         className="form-control form-control-sm border-secondary"
                         style={{ fontSize: '0.75rem', width: 190, background: '#0d1117', color: '#e6edf3', colorScheme: 'dark' }}
-                        value={dateTo}
-                        min={dateFrom || dataDateRange.min}
+                        value={df.dateTo}
+                        min={df.dateFrom || dataDateRange.min}
                         max={dataDateRange.max}
-                        onChange={e => setDateTo(e.target.value)}
+                        onChange={e => dispatch({ type: 'setTo', v: e.target.value })}
                         onKeyDown={e => e.key === 'Enter' && applyFilter()}
                       />
                     </div>
                     <button
+                      type="button"
                       className={`btn btn-sm px-2 py-0 ${isDirty ? 'btn-primary' : 'btn-outline-secondary'}`}
                       style={{ fontSize: '0.75rem' }}
                       onClick={applyFilter}
@@ -216,6 +210,7 @@ export function MainPage({ state, processFile, reset }: Props) {
                     {isFiltered && (
                       <>
                         <button
+                          type="button"
                           className="btn btn-sm btn-outline-secondary px-2 py-0"
                           style={{ fontSize: '0.75rem' }}
                           onClick={clearFilter}
@@ -240,20 +235,9 @@ export function MainPage({ state, processFile, reset }: Props) {
                 </div>
 
                 <StatCards agg={filteredAgg} />
-                <div className="row g-3">
-                  <div className="col-12 col-lg-8">
-                    <TimeSeriesChart agg={filteredAgg} />
-                  </div>
-                  <div className="col-12 col-lg-4">
-                    <StatusDistributionChart agg={filteredAgg} />
-                  </div>
-                  <div className="col-12 col-lg-6">
-                    <TopIPsChart agg={filteredAgg} />
-                  </div>
-                  <div className="col-12 col-lg-6">
-                    <SeverityChart agg={filteredAgg} />
-                  </div>
-                </div>
+                <Suspense fallback={<div className="text-muted text-center py-4 small">Loading charts…</div>}>
+                  <LazyChartsGrid agg={filteredAgg} />
+                </Suspense>
               </div>
             ) : tab === 'dashboard' && !hasData ? (
               <div className="d-flex align-items-center justify-content-center h-100 text-muted">
@@ -273,7 +257,7 @@ export function MainPage({ state, processFile, reset }: Props) {
             <div className="alert alert-danger m-3 d-flex gap-2">
               <i className="bi bi-exclamation-triangle-fill" />
               <span>{state.error}</span>
-              <button className="btn-close btn-close-white ms-auto" onClick={reset} />
+              <button type="button" className="btn-close btn-close-white ms-auto" aria-label="Dismiss error" onClick={reset} />
             </div>
           )}
         </>

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import type { AnalyticsState } from '../../hooks/useLogAnalytics';
 
 interface NavbarProps {
@@ -30,25 +30,18 @@ const NAV_LINKS = [
 ];
 
 export function Navbar({ state, onReset }: NavbarProps) {
-  const navigate = useNavigate();
   const isActive = state.status !== 'idle';
-
-  function handleLogo() {
-    navigate('/');
-  }
 
   return (
     <nav className="navbar navbar-dark bg-dark border-bottom border-secondary px-3 py-2">
       <div className="d-flex align-items-center gap-3">
-        <span
-          className="navbar-brand mb-0 fw-bold text-white d-flex align-items-center gap-2"
-          style={{ cursor: 'pointer' }}
-          onClick={handleLogo}
-          title="Back to home"
+        <Link
+          to="/"
+          className="navbar-brand mb-0 fw-bold text-white d-flex align-items-center gap-2 text-decoration-none"
         >
           <img src="/favicon.svg" alt="" width={22} height={21} style={{ display: 'block' }} />
           OmniLog
-        </span>
+        </Link>
         {isActive && state.fileName && (
           <span className="text-secondary small d-none d-md-inline">
             {state.fileName}
@@ -92,9 +85,11 @@ export function Navbar({ state, onReset }: NavbarProps) {
 
         {isActive && (
           <button
+            type="button"
             className="btn btn-sm btn-outline-secondary"
-            onClick={onReset}
+            aria-label="Clear and reset"
             title="Clear and reset"
+            onClick={onReset}
           >
             <i className="bi bi-x-lg" />
           </button>

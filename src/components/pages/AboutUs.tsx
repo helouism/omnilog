@@ -6,7 +6,7 @@ export function AboutUs() {
     <div className="flex-grow-1 overflow-auto" style={{ background: '#0d1117', color: '#e6edf3' }}>
       <div className="container py-5" style={{ maxWidth: 760 }}>
 
-        <button className="btn btn-sm btn-outline-secondary mb-4" onClick={() => navigate(-1)}>
+        <button type="button" className="btn btn-sm btn-outline-secondary mb-4" onClick={() => navigate(-1)}>
           <i className="bi bi-arrow-left me-2" />Back
         </button>
 
@@ -20,7 +20,7 @@ export function AboutUs() {
 
         <p className="lead text-secondary mb-5">
           A high-performance, privacy-first log analytics platform that runs 100% in your browser.
-          Your log files are never uploaded — all processing happens locally on your machine.
+          Your log files are never uploaded; all processing happens locally on your machine.
         </p>
 
         <div className="row g-4 mb-5">

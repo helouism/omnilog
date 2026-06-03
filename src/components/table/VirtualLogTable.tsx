@@ -68,10 +68,10 @@ function exportCsv(entries: LogEntry[], filename: string) {
 }
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active) return <i className="bi bi-chevron-expand ms-1 opacity-25" style={{ fontSize: '0.6rem' }} />;
+  if (!active) return <i className="bi bi-chevron-expand ms-1 opacity-25" style={{ fontSize: '0.75rem' }} />;
   return dir === 'asc'
-    ? <i className="bi bi-chevron-up ms-1" style={{ fontSize: '0.6rem' }} />
-    : <i className="bi bi-chevron-down ms-1" style={{ fontSize: '0.6rem' }} />;
+    ? <i className="bi bi-chevron-up ms-1" style={{ fontSize: '0.75rem' }} />
+    : <i className="bi bi-chevron-down ms-1" style={{ fontSize: '0.75rem' }} />;
 }
 
 export function VirtualLogTable({ entries }: VirtualLogTableProps) {
@@ -130,7 +130,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
   const displayEntries = useMemo(() => {
     if (!sortColumn) return filteredEntries;
     const dir = sortDir === 'asc' ? 1 : -1;
-    return [...filteredEntries].sort((a, b) => {
+    return filteredEntries.toSorted((a, b) => {
       if (sortColumn === 'severity') {
         return dir * (SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]);
       }
@@ -163,13 +163,14 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
   function colHeader(label: string, col: SortColumn, width: number) {
     const active = sortColumn === col;
     return (
-      <span
-        style={{ width, flexShrink: 0, cursor: 'pointer', userSelect: 'none' }}
-        className={active ? 'text-light' : 'text-muted'}
+      <button
+        type="button"
+        className={`col-sort-btn ${active ? 'text-light' : 'text-muted'}`}
+        style={{ width }}
         onClick={() => handleSort(col)}
       >
         {label}<SortIcon active={active} dir={sortDir} />
-      </span>
+      </button>
     );
   }
 
@@ -183,7 +184,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
         onExportCsv={handleExport}
       />
 
-      <div className="table-header d-flex px-3 py-1 border-bottom border-secondary small" style={{ fontSize: '0.7rem' }}>
+      <div className="table-header d-flex px-3 py-1 border-bottom border-secondary small" style={{ fontSize: '0.75rem' }}>
         <span style={{ width: 20, flexShrink: 0 }} />
         {colHeader('ID', 'id', 55)}
         {colHeader('TIMESTAMP', 'timestamp', 155)}
@@ -221,17 +222,18 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
               >
                 <div className="d-flex align-items-center px-3" style={{ height: ROW_HEIGHT }}>
                   <button
+                    type="button"
                     className="btn btn-link p-0 text-muted d-flex align-items-center"
                     style={{ width: 20, flexShrink: 0, lineHeight: 1 }}
+                    aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
                     onClick={() => toggleExpand(entry.id)}
-                    title={isExpanded ? 'Collapse' : 'Expand'}
                   >
-                    <i className={`bi bi-chevron-${isExpanded ? 'down' : 'right'}`} style={{ fontSize: '0.6rem' }} />
+                    <i className={`bi bi-chevron-${isExpanded ? 'down' : 'right'}`} style={{ fontSize: '0.75rem' }} />
                   </button>
                   <span className="text-muted" style={{ width: 55, flexShrink: 0 }}>{entry.id}</span>
                   <span style={{ width: 155, flexShrink: 0 }}>{formatTs(entry.timestamp)}</span>
                   <span style={{ width: 80, flexShrink: 0 }}>
-                    <span className={`badge ${SEVERITY_BADGE[entry.severity]}`} style={{ fontSize: '0.65rem' }}>
+                    <span className={`badge ${SEVERITY_BADGE[entry.severity]}`} style={{ fontSize: '0.75rem' }}>
                       {entry.severity}
                     </span>
                   </span>
@@ -251,7 +253,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
                   >
                     <pre
                       className="mb-0 opacity-75"
-                      style={{ fontSize: '0.7rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'inherit' }}
+                      style={{ fontSize: '0.75rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'inherit' }}
                     >
                       {entry.raw}
                     </pre>

@@ -59,7 +59,7 @@ export function BlogPost() {
               <span
                 key={tag}
                 className="badge"
-                style={{ background: '#21262d', color: '#8b949e', fontSize: '0.7rem' }}
+                style={{ background: '#21262d', color: '#8b949e', fontSize: '0.75rem' }}
               >
                 {tag}
               </span>

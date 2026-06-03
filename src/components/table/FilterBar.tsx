@@ -42,13 +42,16 @@ export function FilterBar({ filter, onChange, totalRows, filteredRows, onExportC
               type="text"
               className="form-control bg-dark border-secondary text-white"
               placeholder={filter.isRegex ? 'Regex pattern…' : 'Search logs…'}
+              aria-label="Search logs"
               value={filter.query}
               onChange={e => onChange({ ...filter, query: e.target.value })}
             />
             <button
+              type="button"
               className={`btn btn-sm ${filter.isRegex ? 'btn-primary' : 'btn-outline-secondary'}`}
-              onClick={() => onChange({ ...filter, isRegex: !filter.isRegex })}
+              aria-label="Toggle regex mode"
               title="Toggle regex mode"
+              onClick={() => onChange({ ...filter, isRegex: !filter.isRegex })}
             >
               <i className="bi bi-regex" />
             </button>
@@ -59,8 +62,9 @@ export function FilterBar({ filter, onChange, totalRows, filteredRows, onExportC
           {ALL_SEVERITIES.map(s => (
             <button
               key={s}
+              type="button"
               className={`btn btn-xs px-2 py-0 rounded-pill border ${filter.severities.includes(s) ? `btn-${SEVERITY_COLOR[s]}` : 'btn-outline-secondary text-muted'}`}
-              style={{ fontSize: '0.7rem', lineHeight: '1.6' }}
+              style={{ fontSize: '0.75rem', lineHeight: '1.6' }}
               onClick={() => toggleSeverity(s)}
             >
               {s}
@@ -68,8 +72,9 @@ export function FilterBar({ filter, onChange, totalRows, filteredRows, onExportC
           ))}
           {filter.severities.length > 0 && (
             <button
+              type="button"
               className="btn btn-xs px-2 py-0 text-muted"
-              style={{ fontSize: '0.7rem', lineHeight: '1.6' }}
+              style={{ fontSize: '0.75rem', lineHeight: '1.6' }}
               onClick={() => onChange({ ...filter, severities: [] })}
             >
               clear
@@ -86,9 +91,10 @@ export function FilterBar({ filter, onChange, totalRows, filteredRows, onExportC
             )}
           </span>
           <button
+            type="button"
             className="btn btn-sm btn-outline-secondary"
-            onClick={onExportCsv}
             title="Export filtered rows as CSV"
+            onClick={onExportCsv}
           >
             <i className="bi bi-download me-1" />CSV
           </button>

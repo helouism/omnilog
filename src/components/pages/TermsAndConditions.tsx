@@ -16,7 +16,7 @@ export function TermsAndConditions() {
     <div className="flex-grow-1 overflow-auto" style={{ background: '#0d1117', color: '#e6edf3' }}>
       <div className="container py-5" style={{ maxWidth: 760 }}>
 
-        <button className="btn btn-sm btn-outline-secondary mb-4" onClick={() => navigate(-1)}>
+        <button type="button" className="btn btn-sm btn-outline-secondary mb-4" onClick={() => navigate(-1)}>
           <i className="bi bi-arrow-left me-2" />Back
         </button>
 
@@ -67,8 +67,8 @@ export function TermsAndConditions() {
         <Section title="4. Limitation of Liability">
           <p>
             To the maximum extent permitted by applicable law, OmniLog and its contributors shall not be liable
-            for any indirect, incidental, special, consequential, or punitive damages — including loss of data,
-            loss of revenue, or business interruption — arising out of or in connection with your use of the application.
+            for any indirect, incidental, special, consequential, or punitive damages (including loss of data,
+            loss of revenue, or business interruption) arising out of or in connection with your use of the application.
           </p>
           <p>
             Because OmniLog processes files entirely in your browser and makes no network requests, we have no

@@ -41,9 +41,10 @@ export function Dropzone({ onFile }: DropzoneProps) {
 
   return (
     <div className="d-flex flex-column align-items-center justify-content-center h-100 p-4">
-      <div
+      <button
+        type="button"
         className={`dropzone-area rounded-4 border-2 d-flex flex-column align-items-center justify-content-center gap-3 p-5 w-100 ${isDragging ? 'dropzone-active' : ''}`}
-        style={{ maxWidth: 560, minHeight: 320, cursor: 'pointer' }}
+        style={{ maxWidth: 560, minHeight: 320, cursor: 'pointer', font: 'inherit' }}
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
@@ -54,6 +55,7 @@ export function Dropzone({ onFile }: DropzoneProps) {
           type="file"
           className="d-none"
           accept="*"
+          aria-label="Upload log file"
           onChange={onInputChange}
         />
 
@@ -81,13 +83,13 @@ export function Dropzone({ onFile }: DropzoneProps) {
         <div className="text-center mt-2">
           <p className="text-muted small mb-0">
             <i className="bi bi-shield-lock-fill text-success me-1" />
-            Zero-egress — your data never leaves this device
+            Zero-egress: your data never leaves this device
           </p>
           <p className="text-muted small mb-0">
             Handles files up to 100+ GB via streaming
           </p>
         </div>
-      </div>
+      </button>
 
       {error && (
         <div className="alert alert-danger d-flex align-items-center gap-2 mt-3 w-100" style={{ maxWidth: 560 }}>
@@ -104,7 +106,7 @@ export function Dropzone({ onFile }: DropzoneProps) {
         ].map(({ icon, label, color }) => (
           <div key={label} className="d-flex flex-column align-items-center gap-1">
             <i className={`bi ${icon} ${color} fs-5`} />
-            <span className="text-muted small" style={{ fontSize: '0.7rem' }}>{label}</span>
+            <span className="text-muted small" style={{ fontSize: '0.75rem' }}>{label}</span>
           </div>
         ))}
       </div>

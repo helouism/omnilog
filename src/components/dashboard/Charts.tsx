@@ -80,7 +80,7 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
       existing.errors += b.errors;
       buckets.set(key, existing);
     }
-    const sorted = [...buckets.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+    const sorted = [...buckets.entries()].toSorted((a, b) => a[0].localeCompare(b[0]));
     const labelOf = (key: string) =>
       granularity === 'hour' ? key.replace('T', ' ') + ':00' : key;
     return {
@@ -127,8 +127,9 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
             {GRANULARITY_OPTIONS.map(opt => (
               <button
                 key={opt.value}
+                type="button"
                 className={`btn btn-xs px-2 py-0 ${granularity === opt.value ? 'btn-primary' : 'btn-outline-secondary'}`}
-                style={{ fontSize: '0.7rem' }}
+                style={{ fontSize: '0.75rem' }}
                 onClick={() => setGranularity(opt.value)}
               >
                 {opt.label}
@@ -236,9 +237,22 @@ const SEVERITY_COLORS: Record<string, string> = {
   UNKNOWN: '#495057',
 };
 
+export function ChartsGrid({ agg }: ChartsProps) {
+  return (
+    <div className="row g-3">
+      <div className="col-12 col-lg-8"><TimeSeriesChart agg={agg} /></div>
+      <div className="col-12 col-lg-4"><StatusDistributionChart agg={agg} /></div>
+      <div className="col-12 col-lg-6"><TopIPsChart agg={agg} /></div>
+      <div className="col-12 col-lg-6"><SeverityChart agg={agg} /></div>
+    </div>
+  );
+}
+
+export default ChartsGrid;
+
 export function SeverityChart({ agg }: ChartsProps) {
   if (!agg.severityDistribution.length) return null;
-  const sorted = [...agg.severityDistribution].sort((a, b) => b.count - a.count);
+  const sorted = agg.severityDistribution.toSorted((a, b) => b.count - a.count);
   const data = {
     labels: sorted.map(d => d.severity),
     datasets: [{
