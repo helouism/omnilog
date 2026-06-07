@@ -23,6 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Claude Code local config
+.claude/
+
 # wrangler files
 .wrangler
 .dev.vars*
