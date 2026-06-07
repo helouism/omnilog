@@ -78,7 +78,7 @@ const ROUTES = [
   {
     path: '/contact',
     title: 'Contact — OmniLog',
-    description: 'Get in touch with the OmniLog team. Report bugs, suggest features, or ask questions via email or GitHub Issues.',
+    description: 'Get in touch with the OmniLog team. Report bugs, suggest features, or ask questions via email or follow us on Telegram.',
   },
 ];
 

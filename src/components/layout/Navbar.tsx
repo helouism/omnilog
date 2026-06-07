@@ -51,7 +51,7 @@ export function Navbar({ state, onReset }: NavbarProps) {
       </div>
 
       <div className="d-flex align-items-center gap-3">
-        <div className="d-flex gap-3">
+        <div className="d-flex align-items-center gap-3">
           {NAV_LINKS.map(({ label, to }) => (
             <Link
               key={to}
@@ -62,6 +62,17 @@ export function Navbar({ state, onReset }: NavbarProps) {
               {label}
             </Link>
           ))}
+          <a
+            href="https://t.me/omnilogofficial"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted"
+            title="OmniLog on Telegram"
+            aria-label="OmniLog on Telegram"
+            style={{ fontSize: '1rem', lineHeight: 1 }}
+          >
+            <i className="bi bi-telegram" />
+          </a>
         </div>
 
         {isActive && state.format !== 'unknown' && (
