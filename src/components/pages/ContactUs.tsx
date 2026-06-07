@@ -31,7 +31,7 @@ export function ContactUs() {
               <i className="bi bi-envelope-fill text-primary mb-3" style={{ fontSize: '1.5rem' }} />
               <h5 className="fw-semibold mb-2">Email</h5>
               <p className="text-muted small mb-3">
-                For general questions, feature requests, or anything else.
+                For general questions, feature requests, or anything that doesn't fit a GitHub issue.
               </p>
               <a href="mailto:hendrikmahdi@gmail.com" className="text-info text-decoration-none small">
                 hendrikmahdi@gmail.com
@@ -45,7 +45,7 @@ export function ContactUs() {
           <p className="text-muted mb-0" style={{ lineHeight: 1.8, fontSize: '0.95rem' }}>
             OmniLog is fully client-side. Your log files never leave your browser —
             there is no backend server, no database, and no upload endpoint.
-            If you want to verify this, read our{' '}
+            If you want to verify this, inspect the source on GitHub or read our{' '}
             <Link to="/privacy" className="text-info">Privacy Policy</Link>.
           </p>
         </div>
