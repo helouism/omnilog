@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { POSTS } from '../../content/posts';
 
@@ -10,6 +11,10 @@ function formatDate(iso: string): string {
 }
 
 export function BlogList() {
+  useEffect(() => {
+    document.title = 'Blog — OmniLog';
+  }, []);
+
   const sorted = POSTS.toSorted((a, b) => b.date.localeCompare(a.date));
 
   return (

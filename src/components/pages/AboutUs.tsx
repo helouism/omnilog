@@ -1,6 +1,10 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export function AboutUs() {
+  useEffect(() => {
+    document.title = 'About OmniLog — Privacy-First Browser Log Analytics';
+  }, []);
   const navigate = useNavigate();
   return (
     <div className="flex-grow-1 overflow-auto" style={{ background: '#0d1117', color: '#e6edf3' }}>

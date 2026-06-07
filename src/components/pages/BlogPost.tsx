@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -15,6 +16,10 @@ export function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
   const post = POSTS.find(p => p.slug === slug);
   const content = slug ? getPostContent(slug) : null;
+
+  useEffect(() => {
+    if (post) document.title = `${post.title} — OmniLog Blog`;
+  }, [post]);
 
   if (!post || !content) {
     return (

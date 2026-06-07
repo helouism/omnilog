@@ -25,8 +25,8 @@ function formatBytes(bytes: number): string {
 const NAV_LINKS = [
   { label: 'Blog', to: '/blog' },
   { label: 'About', to: '/about' },
+  { label: 'Contact', to: '/contact' },
   { label: 'Privacy', to: '/privacy' },
-  { label: 'Terms', to: '/terms' },
 ];
 
 export function Navbar({ state, onReset }: NavbarProps) {

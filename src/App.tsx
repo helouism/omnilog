@@ -6,6 +6,7 @@ import { PrivacyPolicy } from './components/pages/PrivacyPolicy';
 import { TermsAndConditions } from './components/pages/TermsAndConditions';
 import { BlogList } from './components/pages/BlogList';
 import { BlogPost } from './components/pages/BlogPost';
+import { ContactUs } from './components/pages/ContactUs';
 import { useLogAnalytics } from './hooks/useLogAnalytics';
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/contact" element={<ContactUs />} />
       </Routes>
     </div>
   );

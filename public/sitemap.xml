@@ -2,15 +2,39 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://omnilog.my.id/</loc>
-    <lastmod>2026-05-27</lastmod>
+    <lastmod>2026-06-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://omnilog.my.id/blog</loc>
-    <lastmod>2026-06-01</lastmod>
+    <lastmod>2026-06-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://omnilog.my.id/blog/nginx-access-log-format</loc>
+    <lastmod>2026-06-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://omnilog.my.id/blog/ufw-iptables-log-guide</loc>
+    <lastmod>2026-06-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://omnilog.my.id/blog/apache-error-log-codes</loc>
+    <lastmod>2026-06-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://omnilog.my.id/blog/syslog-severity-levels</loc>
+    <lastmod>2026-06-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://omnilog.my.id/blog/linux-log-files-guide</loc>
@@ -20,13 +44,19 @@
   </url>
   <url>
     <loc>https://omnilog.my.id/blog/parsing-100gb-logs-in-the-browser</loc>
-    <lastmod>2026-05-28</lastmod>
+    <lastmod>2025-06-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://omnilog.my.id/about</loc>
-    <lastmod>2026-05-27</lastmod>
+    <lastmod>2026-06-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://omnilog.my.id/contact</loc>
+    <lastmod>2026-06-07</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
