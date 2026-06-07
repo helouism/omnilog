@@ -5,6 +5,12 @@ on:
     branches: [main]
     paths:
       - 'src/content/posts.ts'
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Blog post slug to announce (e.g. nginx-access-log-format)'
+        required: true
+        type: string
 
 jobs:
   notify:
@@ -17,6 +23,7 @@ jobs:
       - name: Send Telegram notifications for new posts
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          MANUAL_SLUG: ${{ inputs.slug }}
         run: |
           python3 << 'EOF'
           import json, os, re, subprocess, urllib.request, urllib.error
@@ -24,19 +31,26 @@ jobs:
           with open('src/content/posts.ts') as f:
               current = f.read()
 
-          try:
-              prev = subprocess.check_output(
-                  ['git', 'show', 'HEAD~1:src/content/posts.ts'],
-                  text=True, stderr=subprocess.DEVNULL
-              )
-          except subprocess.CalledProcessError:
-              prev = ''
+          manual_slug = os.environ.get('MANUAL_SLUG', '').strip()
 
-          def get_slugs(text):
-              return [m.group(1) for m in re.finditer(r"slug:\s*'([^']+)'", text)]
+          if manual_slug:
+              # Manual trigger: announce a specific post by slug
+              new_slugs = [manual_slug]
+          else:
+              # Push trigger: detect slugs added in this commit
+              try:
+                  prev = subprocess.check_output(
+                      ['git', 'show', 'HEAD~1:src/content/posts.ts'],
+                      text=True, stderr=subprocess.DEVNULL
+                  )
+              except subprocess.CalledProcessError:
+                  prev = ''
 
-          prev_slugs = set(get_slugs(prev))
-          new_slugs = [s for s in get_slugs(current) if s not in prev_slugs]
+              def get_slugs(text):
+                  return [m.group(1) for m in re.finditer(r"slug:\s*'([^']+)'", text)]
+
+              prev_slugs = set(get_slugs(prev))
+              new_slugs = [s for s in get_slugs(current) if s not in prev_slugs]
 
           if not new_slugs:
               print('No new posts detected.')
