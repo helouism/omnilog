@@ -9,6 +9,87 @@ export interface PostMeta {
 
 export const POSTS: PostMeta[] = [
   {
+    slug: 'http-status-codes-explained',
+    title: 'HTTP Status Codes Explained (With Real Log Examples)',
+    date: '2026-06-13',
+    description:
+      'Every class of HTTP status code — 2xx to 5xx — explained with the access-log lines you actually see, how to spot scanners in 4xx floods, and how to read the status distribution at a glance.',
+    readingTime: '8 min read',
+    tags: ['http', 'status-codes', 'nginx', 'devops'],
+  },
+  {
+    slug: 'grep-awk-log-analysis',
+    title: 'Analysing Logs With grep and awk: A Practical Cookbook',
+    date: '2026-06-13',
+    description:
+      'The grep and awk patterns that actually come up in log analysis: filter, count, rank top offenders, sum and average fields, work with timestamps, and run a real investigation end to end.',
+    readingTime: '9 min read',
+    tags: ['grep', 'awk', 'command-line', 'devops'],
+  },
+  {
+    slug: 'docker-container-logs',
+    title: 'How to View and Manage Docker Container Logs',
+    date: '2026-06-13',
+    description:
+      'Master docker logs: follow live output, filter by time, find where logs live on disk, avoid the disk-filling trap with rotation, and export container logs for analysis.',
+    readingTime: '8 min read',
+    tags: ['docker', 'containers', 'devops', 'logging'],
+  },
+  {
+    slug: 'mysql-slow-query-log',
+    title: 'The MySQL Slow Query Log: Finding the Queries That Hurt',
+    date: '2026-06-13',
+    description:
+      'Enable and read the MySQL slow query log, decode Rows_examined vs Rows_sent to spot missing indexes, summarise with mysqldumpslow, and diagnose culprits with EXPLAIN.',
+    readingTime: '8 min read',
+    tags: ['mysql', 'database', 'performance', 'sql'],
+  },
+  {
+    slug: 'dmesg-kernel-log-guide',
+    title: 'Reading the Kernel Log: A Practical Guide to dmesg',
+    date: '2026-06-13',
+    description:
+      'Read the kernel ring buffer with dmesg: human-readable timestamps, severity filtering, and recognising OOM kills, disk I/O errors, read-only remounts, link flaps, and kernel panics.',
+    readingTime: '8 min read',
+    tags: ['dmesg', 'kernel', 'linux', 'troubleshooting'],
+  },
+  {
+    slug: 'detect-ssh-brute-force-auth-log',
+    title: 'How to Detect SSH Brute-Force Attacks in auth.log',
+    date: '2026-06-13',
+    description:
+      'Read auth.log like an analyst: spot failed passwords, invalid users, and the one Accepted line that signals a breach. Command-line hunting plus how to shut brute-force attacks down.',
+    readingTime: '8 min read',
+    tags: ['ssh', 'security', 'auth-log', 'linux'],
+  },
+  {
+    slug: 'journalctl-cheat-sheet',
+    title: 'journalctl Cheat Sheet: Querying the systemd Journal',
+    date: '2026-06-13',
+    description:
+      'The journalctl reference you will actually keep open: filter by service, time, boot, and priority, export logs, manage journal size, and combine filters for targeted queries.',
+    readingTime: '8 min read',
+    tags: ['journalctl', 'systemd', 'linux', 'logging'],
+  },
+  {
+    slug: 'logrotate-configuration-guide',
+    title: 'How logrotate Works: Configuring Log Rotation on Linux',
+    date: '2026-06-13',
+    description:
+      'A complete guide to logrotate: every directive in a real config explained, the open-file-handle bug that breaks rotation, copytruncate vs postrotate, and how to test safely.',
+    readingTime: '8 min read',
+    tags: ['logrotate', 'devops', 'linux', 'sysadmin'],
+  },
+  {
+    slug: 'fail2ban-log-analysis',
+    title: 'How fail2ban Reads Your Logs to Block Attackers',
+    date: '2026-06-13',
+    description:
+      'Understand fail2ban as a log parser with consequences: jails, filters and failregex, the maxretry/findtime/bantime window, testing filters, and tuning without locking yourself out.',
+    readingTime: '8 min read',
+    tags: ['fail2ban', 'security', 'firewall', 'devops'],
+  },
+  {
     slug: 'linux-log-files-guide',
     title: 'Linux Log Files Explained: syslog, kern.log, auth.log and Everything in Between',
     date: '2026-06-01',
