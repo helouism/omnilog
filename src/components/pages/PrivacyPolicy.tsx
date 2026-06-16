@@ -26,15 +26,21 @@ export function PrivacyPolicy() {
 
         <div className="mb-4">
           <h1 className="fw-bold mb-1" style={{ fontSize: '1.75rem' }}>Privacy Policy</h1>
-          <span className="text-muted small">Last updated: May 2026</span>
+          <span className="text-muted small">Last updated: June 2026</span>
         </div>
 
         <Section title="1. Information We Collect">
-          <p>We collect <strong className="text-light">no information whatsoever</strong>.</p>
+          <p>We ourselves collect <strong className="text-light">no information whatsoever</strong>.</p>
           <p>
-            OmniLog is a fully client-side application. It has no backend, no database, and makes no outbound
-            network requests. Your log files are read directly from your local filesystem via the browser's
-            File API and are processed entirely within your browser tab using Web Workers.
+            OmniLog is a fully client-side application. It has no backend and no database of its own.
+            Your log files are read directly from your local filesystem via the browser's File API and are
+            processed entirely within your browser tab using Web Workers. <strong className="text-light">Your log
+            file contents are never uploaded or transmitted anywhere.</strong>
+          </p>
+          <p>
+            The site does load third-party analytics and advertising scripts (described in Section 4). These
+            make their own network requests and may collect standard browsing data, but they have no access to
+            the contents of the log files you analyse.
           </p>
         </Section>
 
@@ -69,19 +75,19 @@ export function PrivacyPolicy() {
             <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer" className="text-info">Privacy Policy</a>.
           </p>
 
-          <p><strong className="text-light">Google AdSense</strong></p>
+          <p><strong className="text-light">Mondiad (Advertising)</strong></p>
           <p>
-            We display advertisements served by Google AdSense. Google may use cookies and similar technologies
-            to show personalised ads based on your browsing activity. You can opt out or manage your ad preferences
-            via{' '}
-            <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" className="text-info">Google Ad Settings</a>.
-            Google's data practices are governed by the{' '}
-            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-info">Google Privacy Policy</a>.
+            We display advertisements served by Mondiad on our blog pages. Mondiad and its advertising partners
+            may use cookies and similar technologies to serve and measure ads, which can include data such as your
+            IP address, approximate location, device, and browsing activity. These ad scripts run only in your
+            browser and never receive the contents of any log file you analyse. Mondiad's data practices are
+            governed by the{' '}
+            <a href="https://mondiad.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-info">Mondiad Privacy Policy</a>.
           </p>
 
           <p>
-            No other third-party services are used. There is no error reporting, no social media widgets,
-            and no other advertising networks.
+            Aside from the analytics and advertising services named above, no other third-party services are used.
+            There is no error reporting and no social media widgets.
           </p>
         </Section>
 

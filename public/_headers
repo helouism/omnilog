@@ -6,5 +6,6 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 
   # Content Security Policy
-  # Allows: same-origin app, Web Worker blobs, Cloudflare Web Analytics, Google AdSense
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googlesyndication.com https://static.cloudflareinsights.com https://*.adtrafficquality.google https://adservice.google.com https://*.googletagservices.com; connect-src 'self' https://cloudflareinsights.com https://*.googlesyndication.com https://*.doubleclick.net https://*.adtrafficquality.google https://adservice.google.com; frame-src *; img-src 'self' data: https://*.doubleclick.net https://*.googlesyndication.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; font-src 'self' data:;
+  # Allows: same-origin app, Web Worker blobs, Cloudflare Web Analytics, Mondiad
+  # img-src is broadened to https: so third-party ad creatives (served from arbitrary advertiser CDNs) can load.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://*.mrmnd.com; connect-src 'self' https://cloudflareinsights.com https://*.mrmnd.com; frame-src *; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; font-src 'self' data:;

@@ -3,6 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { POSTS, getPostContent } from '../../content/posts';
+import { MondiadAd } from '../ads/MondiadAd';
+
+const NATIVE_ZONE = '47e75021-4652-44ad-babe-0c4f66a578f0';
+const BANNER_ZONE = '8eafd779-c29e-4e96-a0af-075820704372';
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -74,10 +78,31 @@ export function BlogPost() {
 
         <hr style={{ borderColor: '#30363d' }} />
 
+        {/* Banner ad (300x250) — between intro and article body */}
+        <div className="text-center my-4">
+          <div className="text-muted text-uppercase mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.08em' }}>
+            Advertisement
+          </div>
+          <MondiadAd
+            type="banner"
+            zoneId={BANNER_ZONE}
+            className="d-inline-block"
+            style={{ width: 300, height: 250, maxWidth: '100%' }}
+          />
+        </div>
+
         <div className="blog-content mt-5">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {content}
           </ReactMarkdown>
+        </div>
+
+        {/* Native ad — at the end of the article, blends with content */}
+        <div className="mt-5">
+          <div className="text-muted text-uppercase mb-2" style={{ fontSize: '0.65rem', letterSpacing: '0.08em' }}>
+            Advertisement
+          </div>
+          <MondiadAd type="native" zoneId={NATIVE_ZONE} />
         </div>
 
         <hr className="mt-5" style={{ borderColor: '#30363d' }} />

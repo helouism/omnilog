@@ -6,7 +6,7 @@ Privacy-first log analytics that runs **100% in your browser**. Parse and visual
 
 ## Features
 
-- **Zero-egress** — log data never leaves your machine. CSP enforces strict `script-src` and `connect-src` in production; outbound connections are limited to Cloudflare Analytics and Google AdSense.
+- **Zero-egress** — log data never leaves your machine. CSP enforces strict `script-src` and `connect-src` in production; outbound connections are limited to Cloudflare Analytics and Mondiad ads.
 - **Multi-format detection** — auto-detects NGINX, Apache, UFW, Syslog, and generic log formats using confidence scoring.
 - **Streaming Web Worker** — files are read in 50 MB chunks on a background thread, keeping the UI at 60 FPS regardless of file size.
 - **Live dashboard** — request/error trend, HTTP status distribution, top 10 source IPs, severity breakdown, and stat cards — all update progressively as the file is parsed.
@@ -76,7 +76,7 @@ File drop → useLogAnalytics hook → Web Worker
 - All app assets are bundled locally; no CDN dependencies for the app shell
 - Service Worker uses Cache-First for all app shell assets
 - **Cloudflare Web Analytics** — cookieless, aggregate traffic metrics only (page views, country, browser). No personal data collected.
-- **Google AdSense** — serves display ads; may use cookies for ad personalisation per [Google's Privacy Policy](https://policies.google.com/privacy)
+- **Mondiad** — serves native and banner display ads on blog pages only; may use cookies for ad delivery per [Mondiad's Privacy Policy](https://mondiad.com/privacy-policy/)
 
 ## License
 

@@ -62,7 +62,7 @@ File drop → useLogAnalytics hook → new Worker()
 
 **Permitted third-party scripts (already configured in CSP and `index.html`):**
 - `static.cloudflareinsights.com` — Cloudflare Web Analytics (auto-injected by Cloudflare, no code needed)
-- `pagead2.googlesyndication.com` — Google AdSense (`index.html` script tag, publisher ID must be set)
+- `ss.mrmnd.com` — Mondiad ads (`index.html` script tags `native.js` + `banner.js`). Ad slots are rendered only on blog pages via the `MondiadAd` component (`src/components/ads/MondiadAd.tsx`) — never on the main analytics UI. `img-src` is broadened to `https:` in the CSP so ad creatives load.
 
 ### Memory Budget
 - Tab RAM must stay ≤ 500 MB regardless of file size
