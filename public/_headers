@@ -9,4 +9,4 @@
   # Allows: same-origin app, Web Worker blobs, Cloudflare Web Analytics, Mondiad
   # img-src is broadened to https: so third-party ad creatives (served from arbitrary advertiser CDNs) can load.
   # 'unsafe-eval' is required because Mondiad's ad scripts (native.js / banner.js) call eval() internally.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://*.mrmnd.com; connect-src 'self' https://cloudflareinsights.com https://*.mrmnd.com; frame-src *; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; font-src 'self' data:;
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://*.mrmnd.com; connect-src 'self' https://cloudflareinsights.com https://*.mrmnd.com https://klxmnd.com https://*.klxmnd.com; frame-src *; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; font-src 'self' data:;
