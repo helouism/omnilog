@@ -39,7 +39,7 @@ export function Navbar({ state, onReset }: NavbarProps) {
           to="/"
           className="navbar-brand mb-0 fw-bold text-white d-flex align-items-center gap-2 text-decoration-none"
         >
-          <img src="/favicon.svg" alt="" width={22} height={21} style={{ display: 'block' }} />
+          <img src="/favicon.svg" alt="" width={22} height={22} style={{ display: 'block' }} />
           OmniLog
         </Link>
         {isActive && state.fileName && (
