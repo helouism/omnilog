@@ -1,19 +1,11 @@
 import { Link } from 'react-router-dom';
+import { XLg } from '../icons';
 import type { AnalyticsState } from '../../hooks/useLogAnalytics';
 
 interface NavbarProps {
   state: AnalyticsState;
   onReset: () => void;
 }
-
-const FORMAT_BADGE_COLOR: Record<string, string> = {
-  nginx: 'success',
-  apache: 'warning',
-  ufw: 'danger',
-  syslog: 'info',
-  generic: 'secondary',
-  unknown: 'dark',
-};
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -32,43 +24,41 @@ export function Navbar({ state, onReset }: NavbarProps) {
   const isActive = state.status !== 'idle';
 
   return (
-    <nav className="navbar navbar-dark bg-dark border-bottom border-secondary px-3 py-2">
-      <div className="d-flex align-items-center gap-3">
+    <nav
+      className="d-flex align-items-center justify-content-between gap-3 px-3"
+      style={{
+        minHeight: 52,
+        background: 'var(--ol-bg)',
+        borderBottom: '1px solid var(--ol-border)',
+      }}
+    >
+      {/* Left zone: identity + live instrument readout */}
+      {/* minWidth:0 is required for the filename's text-truncate to work inside flex */}
+      <div className="d-flex align-items-center gap-3" style={{ minWidth: 0 }}>
         <Link
           to="/"
-          className="navbar-brand mb-0 fw-bold text-white d-flex align-items-center gap-2 text-decoration-none"
+          className="d-flex align-items-center gap-2 text-decoration-none"
+          style={{ color: 'var(--ol-text)', fontWeight: 600, letterSpacing: '-0.021em' }}
         >
-          <img src="/favicon.svg" alt="" width={22} height={22} style={{ display: 'block' }} />
+          <img src="/favicon.svg" alt="" width={20} height={20} style={{ display: 'block' }} />
           OmniLog
         </Link>
+
         {isActive && state.fileName && (
-          <span className="text-secondary small d-none d-md-inline">
+          <span
+            className="font-mono text-truncate d-none d-md-inline"
+            style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-dim)' }}
+          >
             {state.fileName}
-            <span className="ms-2 text-muted">({formatBytes(state.fileSize)})</span>
+            <span style={{ color: 'var(--ol-text-faint)' }}> · {formatBytes(state.fileSize)}</span>
           </span>
         )}
-      </div>
-
-      <div className="d-flex align-items-center gap-3">
-        <div className="d-flex align-items-center gap-3">
-          {NAV_LINKS.map(({ label, to }) => (
-            <Link
-              key={to}
-              to={to}
-              className="text-muted text-decoration-none"
-              style={{ fontSize: '0.8rem' }}
-            >
-              {label}
-            </Link>
-          ))}
-        </div>
 
         {isActive && state.format !== 'unknown' && (
-          <span className={`badge bg-${FORMAT_BADGE_COLOR[state.format] ?? 'secondary'}`}>
-            <i className="bi bi-braces me-1" />
+          <span className="ol-chip">
             {state.format.toUpperCase()}
             {state.confidence > 0 && (
-              <span className="ms-1 opacity-75">
+              <span style={{ color: 'var(--ol-text-faint)' }}>
                 {Math.round(state.confidence * 100)}%
               </span>
             )}
@@ -76,21 +66,37 @@ export function Navbar({ state, onReset }: NavbarProps) {
         )}
 
         {state.status === 'parsing' && (
-          <span className="badge bg-primary d-flex align-items-center gap-1">
-            <span className="spinner-border spinner-border-sm" />
-            {state.progress}%
-          </span>
+          <span className="ol-chip ol-chip--accent">{state.progress}%</span>
         )}
+      </div>
+
+      {/* Right zone: navigation — recedes while an analysis is active */}
+      <div className="d-flex align-items-center gap-3">
+        <div className="d-none d-sm-flex align-items-center gap-3">
+          {NAV_LINKS.map(({ label, to }) => (
+            <Link
+              key={to}
+              to={to}
+              className="text-decoration-none"
+              style={{
+                fontSize: 'var(--ol-fs-xs)',
+                color: isActive ? 'var(--ol-text-faint)' : 'var(--ol-text-dim)',
+              }}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
 
         {isActive && (
           <button
             type="button"
-            className="btn btn-sm btn-outline-secondary"
+            className="ol-btn ol-btn--ghost ol-btn--icon"
             aria-label="Clear and reset"
             title="Clear and reset"
             onClick={onReset}
           >
-            <i className="bi bi-x-lg" />
+            <XLg size={14} />
           </button>
         )}
       </div>

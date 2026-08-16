@@ -11,7 +11,7 @@ export default function App() {
   const { state, processFile, reset } = useLogAnalytics();
 
   return (
-    <div className="d-flex flex-column h-100 bg-dark text-white" style={{ background: '#0d1117' }}>
+    <div className="d-flex flex-column h-100">
       <Navbar state={state} onReset={reset} />
       <Routes>
         <Route path="/" element={<MainPage key={state.fileName ?? ''} state={state} processFile={processFile} reset={reset} />} />
