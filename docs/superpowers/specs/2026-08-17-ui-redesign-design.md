@@ -98,12 +98,26 @@ lift to. Two flat steps become four.
 |---|---|---|
 | `--ol-text` | `#e8ecf2` | ~15.9:1 |
 | `--ol-text-dim` | `#98a2b0` | 7.15:1 |
-| `--ol-text-faint` | `#616b7a` | 3.41:1 |
+| `--ol-text-faint` | `#7d8797` | 5.09:1 |
 
-`--ol-text-faint` does **not** meet WCAG AA for normal text. It is restricted to
-non-essential metadata that is duplicated or inferable elsewhere (e.g. row ordinals). It
-must never carry the only copy of a piece of information. This is a hard constraint on
-implementation, not a suggestion.
+All three tiers meet WCAG AA for normal text at any size, and carry no usage restriction.
+
+> **Correction from the reviewed design.** `--ol-text-faint` was originally `#616b7a`
+> (3.41:1), paired with a rule forbidding it from carrying the only copy of any information.
+> That was unsound: the token's primary use is small-caps labels at 11–12px, and WCAG's
+> relaxed 3:1 threshold applies only to large text (24px+, or 18.66px bold). The token's main
+> use case was its worst use case, and the rule protecting it would have been violated by
+> accident during implementation. Lightening it to `#7d8797` fixes the value rather than
+> policing it.
+
+**Hierarchy principle.** De-emphasis comes primarily from size, weight, tracking, and
+spacing — with color as reinforcement, not as the sole mechanism. This is more robust than
+leaning on contrast alone, and it is what allows all three text tiers to sit safely above
+the AA floor.
+
+`--ol-text-faint` sits close to `TRACE #78838f`. This is not a collision in practice:
+severity renders as a tinted chip rather than as bare text, so the two never appear in the
+same visual register.
 
 ### Accent
 
@@ -265,14 +279,23 @@ full width. Uniform section width is what currently makes the page feel monotono
 
 ### Chrome
 
-- **Navbar becomes tool-only:** wordmark, live analysis state (filename, format chip,
-  progress), reset. Hairline bottom border; wordmark tracked tighter.
-- **New footer** carrying About / Contact / Privacy / Terms, on the landing and static
-  pages.
+- **Navbar keeps its nav links** (About / Contact / Privacy) alongside the wordmark and live
+  analysis state (filename, format chip, progress) and reset. Hairline bottom border;
+  wordmark tracked tighter.
 
-**Accepted tradeoff:** because the dashboard is a full-height `overflow: hidden` region, the
-footer is not visible while an analysis is open, so legal links are unreachable in that
-state. This was explicitly accepted in favour of an uncluttered navbar.
+  The navbar is laid out in two explicit zones so marketing chrome and instrument readout
+  stop competing: **left** = wordmark plus live analysis state; **right** = nav links, which
+  recede in weight while an analysis is active but remain present and reachable.
+
+- **New footer** carrying About / Contact / Privacy / Terms, on the landing and static pages
+  only.
+
+> **Correction from the reviewed design.** The reviewed version moved nav links out of the
+> navbar into the footer. Because the dashboard is a full-height `overflow: hidden` region,
+> the footer is never visible while an analysis is open — which made legal links unreachable
+> in the app's primary state. Reachability outweighs navbar tidiness, so the links stay in
+> the navbar and the footer is additive rather than a replacement. The two-zone navbar
+> layout addresses the original crowding concern directly.
 
 **Implementation note:** the landing page's scroll container is
 `flex-grow-1 overflow-auto` under a global `html, body, #root { overflow: hidden }`. The
@@ -324,7 +347,7 @@ working and buildable.
 2. Primitives.
 
 **Commit 2 — Surfaces**
-3. Chrome — navbar slims to tool-only, new `Footer` component.
+3. Chrome — navbar restyled into two zones (links retained), new `Footer` component.
 4. Landing — hero, dropzone, feature grid, formats table, steps.
 5. Dashboard — sticky toolbar, stat strip, chart normalisation, token bridge.
 6. Log table.
