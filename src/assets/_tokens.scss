@@ -1,0 +1,131 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// OmniLog design tokens — THE single source of truth for color and scale.
+//
+// No hex literal may appear anywhere else in the codebase (the SSR fallback in
+// Charts.tsx is the one documented exception).
+//
+// Contrast ratios are enforced by scripts/check-contrast.mjs. If you change a
+// color here, run `npm run check:contrast` before committing.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Surfaces ────────────────────────────────────────────────────────────────
+$ol-bg:             #0a0c10;
+$ol-surface-1:      #12151b;
+$ol-surface-2:      #181c24;
+$ol-border-subtle:  #1e232c;
+$ol-border:         #2a313c;
+$ol-border-strong:  #3a434f;
+
+// ─── Text (all three tiers clear WCAG AA at any size) ────────────────────────
+$ol-text:           #e8ecf2;  // ~15.9:1 on surface-1
+$ol-text-dim:       #98a2b0;  //   7.15:1
+$ol-text-faint:     #7d8797;  //   5.09:1
+
+// ─── Accent (from the brand mark gradient in public/favicon.svg) ─────────────
+$ol-accent:         #58a6ff;  // 7.75:1 on bg — interactive/selected state ONLY
+$ol-accent-alt:     #a371f7;  // logo gradient + FATAL severity ONLY
+$ol-on-accent:      #05070a;  // 8.03:1 on accent — text/glyph color on accent fills
+
+// ─── Severity ramp (cool recedes → warm advances) ────────────────────────────
+$ol-sev-trace:      #78838f;  // 4.81:1
+$ol-sev-debug:      #8b95a3;  // 6.10:1
+$ol-sev-info:       #6e9fd4;  // 6.66:1
+$ol-sev-warn:       #d9a441;  // 8.21:1
+$ol-sev-error:      #e5534b;  // 4.99:1
+$ol-sev-fatal:      #a371f7;  // 5.51:1
+$ol-sev-unknown:    #7d8797;  // reuses text-faint
+
+// ─── HTTP status ─────────────────────────────────────────────────────────────
+$ol-status-2xx:     #3fb950;  // 7.20:1
+$ol-status-3xx:     #6e9fd4;  // 6.66:1
+$ol-status-4xx:     #d9a441;  // 8.21:1
+$ol-status-5xx:     #e5534b;  // 4.99:1
+
+// ─── Custom properties ───────────────────────────────────────────────────────
+// Large areas (chart fills) use the same hue at 55% alpha rather than full
+// saturation — a 4px legend swatch and a 300px bar must not read as the same
+// weight of color. chart.js consumes rgba() natively.
+:root {
+  --ol-bg:            #{$ol-bg};
+  --ol-surface-1:     #{$ol-surface-1};
+  --ol-surface-2:     #{$ol-surface-2};
+  --ol-border-subtle: #{$ol-border-subtle};
+  --ol-border:        #{$ol-border};
+  --ol-border-strong: #{$ol-border-strong};
+
+  --ol-text:          #{$ol-text};
+  --ol-text-dim:      #{$ol-text-dim};
+  --ol-text-faint:    #{$ol-text-faint};
+
+  --ol-accent:        #{$ol-accent};
+  --ol-accent-alt:    #{$ol-accent-alt};
+  --ol-on-accent:     #{$ol-on-accent};
+
+  --ol-sev-trace:     #{$ol-sev-trace};
+  --ol-sev-debug:     #{$ol-sev-debug};
+  --ol-sev-info:      #{$ol-sev-info};
+  --ol-sev-warn:      #{$ol-sev-warn};
+  --ol-sev-error:     #{$ol-sev-error};
+  --ol-sev-fatal:     #{$ol-sev-fatal};
+  --ol-sev-unknown:   #{$ol-sev-unknown};
+
+  --ol-status-2xx:    #{$ol-status-2xx};
+  --ol-status-3xx:    #{$ol-status-3xx};
+  --ol-status-4xx:    #{$ol-status-4xx};
+  --ol-status-5xx:    #{$ol-status-5xx};
+
+  // Chart fills — 55% alpha of the matching hue.
+  --ol-sev-trace-fill:   #{rgba($ol-sev-trace, 0.55)};
+  --ol-sev-debug-fill:   #{rgba($ol-sev-debug, 0.55)};
+  --ol-sev-info-fill:    #{rgba($ol-sev-info, 0.55)};
+  --ol-sev-warn-fill:    #{rgba($ol-sev-warn, 0.55)};
+  --ol-sev-error-fill:   #{rgba($ol-sev-error, 0.55)};
+  --ol-sev-fatal-fill:   #{rgba($ol-sev-fatal, 0.55)};
+  --ol-sev-unknown-fill: #{rgba($ol-sev-unknown, 0.55)};
+
+  --ol-status-2xx-fill:  #{rgba($ol-status-2xx, 0.55)};
+  --ol-status-3xx-fill:  #{rgba($ol-status-3xx, 0.55)};
+  --ol-status-4xx-fill:  #{rgba($ol-status-4xx, 0.55)};
+  --ol-status-5xx-fill:  #{rgba($ol-status-5xx, 0.55)};
+
+  --ol-accent-fill:      #{rgba($ol-accent, 0.55)};
+  --ol-accent-wash:      #{rgba($ol-accent, 0.08)};
+  --ol-grid-line:        #{rgba(#ffffff, 0.05)};
+
+  // ─── Type scale ───────────────────────────────────────────────────────────
+  --ol-fs-2xs:  0.6875rem;  // 11px — badges, table meta
+  --ol-fs-xs:   0.75rem;    // 12px — labels, captions
+  --ol-fs-sm:   0.8125rem;  // 13px — table body, dense UI
+  --ol-fs-base: 0.875rem;   // 14px — app default
+  --ol-fs-md:   1rem;       // 16px — marketing body
+  --ol-fs-lg:   1.125rem;   // 18px — section leads
+  --ol-fs-xl:   1.375rem;   // 22px — section headings
+  --ol-fs-2xl:  1.75rem;    // 28px — page titles
+  --ol-fs-3xl:  clamp(2rem, 4.5vw, 3rem);
+
+  // ─── Line height by role ──────────────────────────────────────────────────
+  --ol-lh-heading: 1.15;
+  --ol-lh-ui:      1.5;
+  --ol-lh-prose:   1.7;
+  --ol-lh-row:     1.45;
+
+  // ─── Space scale ──────────────────────────────────────────────────────────
+  --ol-sp-1: 0.25rem;
+  --ol-sp-2: 0.5rem;
+  --ol-sp-3: 0.75rem;
+  --ol-sp-4: 1rem;
+  --ol-sp-5: 1.5rem;
+  --ol-sp-6: 2rem;
+  --ol-sp-7: 3rem;
+  --ol-sp-8: 4rem;
+
+  // ─── Radius ───────────────────────────────────────────────────────────────
+  --ol-r-sm: 4px;
+  --ol-r-md: 6px;
+  --ol-r-lg: 10px;
+  --ol-r-xl: 14px;
+
+  // ─── Measure ──────────────────────────────────────────────────────────────
+  --ol-measure: 68ch;
+  --ol-page-max: 1120px;
+}
