@@ -1,18 +1,27 @@
-// Bootstrap variable overrides — must come before import
-$body-bg: #0d1117;
-$body-color: #e6edf3;
-$card-bg: #161b22;
-$card-border-color: #30363d;
-$border-color: #30363d;
-$input-bg: #161b22;
-$input-color: #e6edf3;
-$input-border-color: #30363d;
-$input-focus-border-color: #0d6efd;
-$input-placeholder-color: #484f58;
-$nav-link-color: #8b949e;
-$font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, SFMono-Regular, monospace;
+// Tokens first — they define the SCSS variables the Bootstrap overrides below use.
+@import 'tokens';
+
+// ─── Bootstrap variable overrides (MUST precede the bootstrap import) ────────
+$body-bg:                 $ol-bg;
+$body-color:              $ol-text;
+$card-bg:                 $ol-surface-1;
+$card-border-color:       $ol-border;
+$border-color:            $ol-border;
+$input-bg:                $ol-surface-1;
+$input-color:             $ol-text;
+$input-border-color:      $ol-border;
+$input-focus-border-color: $ol-accent;
+$input-placeholder-color: $ol-text-faint;
+$nav-link-color:          $ol-text-dim;
+$primary:                 $ol-accent;
+
+$font-family-sans-serif: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-family-monospace:  'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Consolas, monospace;
+$font-family-base:       $font-family-sans-serif;
 
 @import 'bootstrap/scss/bootstrap';
+
+@import 'primitives';
 
 // ─── Global ──────────────────────────────────────────────────────────────────
 
@@ -22,115 +31,67 @@ html, body, #root {
 }
 
 body {
-  font-size: 0.875rem;
+  font-family: $font-family-sans-serif;
+  font-size: var(--ol-fs-base);
+  line-height: var(--ol-lh-ui);
+  background: var(--ol-bg);
+  color: var(--ol-text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  // Tabular numerals everywhere by default: this app is mostly numbers, and
+  // proportional figures make counts jitter as they update during parsing.
+  font-variant-numeric: tabular-nums;
 }
 
-// ─── Scrollbars ───────────────────────────────────────────────────────────────
+// ─── Headings: optical tracking + balanced wrapping ──────────────────────────
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+h1, h2, h3, h4, h5, h6 {
+  line-height: var(--ol-lh-heading);
+  text-wrap: balance;
+  font-weight: 600;
 }
+
+h1 { font-size: var(--ol-fs-3xl); letter-spacing: -0.021em; }
+h2 { font-size: var(--ol-fs-2xl); letter-spacing: -0.021em; }
+h3 { font-size: var(--ol-fs-xl);  letter-spacing: -0.014em; }
+
+p { text-wrap: pretty; }
+
+// ─── Links ───────────────────────────────────────────────────────────────────
+
+a {
+  color: var(--ol-accent);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+// ─── Focus: one visible ring everywhere ──────────────────────────────────────
+
+:focus-visible {
+  outline: 2px solid var(--ol-accent);
+  outline-offset: 2px;
+}
+
+// ─── Scrollbars ──────────────────────────────────────────────────────────────
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #30363d;
-  border-radius: 3px;
-  &:hover { background: #484f58; }
+  background: var(--ol-border);
+  border-radius: var(--ol-r-sm);
+  &:hover { background: var(--ol-border-strong); }
 }
 
-// ─── Dropzone ─────────────────────────────────────────────────────────────────
+// ─── Utilities ───────────────────────────────────────────────────────────────
 
-.dropzone-area {
-  border: 2px dashed #30363d;
-  background: #0d1117;
-  transition: border-color 0.2s ease, background 0.2s ease;
-  user-select: none;
+.font-mono { font-family: $font-family-monospace; }
 
-  &:hover, &.dropzone-active {
-    border-color: #0d6efd;
-    background: rgba(13, 110, 253, 0.05);
-  }
-}
+.ol-measure { max-width: var(--ol-measure); }
 
-.drop-icon {
-  color: #30363d;
-  transition: color 0.2s ease, transform 0.2s ease;
-
-  &.drop-icon-active {
-    color: #0d6efd;
-    transform: scale(1.1) translateY(-4px);
-  }
-}
-
-// ─── Log table rows ───────────────────────────────────────────────────────────
-
-.log-row {
-  transition: background 0.1s;
-  &:hover { background: rgba(255,255,255,0.03); }
-}
-
-.text-purple { color: #bc8cff !important; }
-.bg-purple { background-color: #6f42c1 !important; }
-
-// ─── Filter bar ───────────────────────────────────────────────────────────────
-
-.btn-xs {
-  font-size: 0.7rem;
-  padding: 0.1rem 0.45rem;
-  line-height: 1.6;
-}
-
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-
-.navbar {
-  min-height: 48px;
-}
-
-// ─── Tab panels ───────────────────────────────────────────────────────────────
-
-.nav-tabs .nav-link {
-  color: #8b949e;
-  border-color: transparent;
-  font-size: 0.8rem;
-  padding: 0.4rem 0.9rem;
-
-  &.active {
-    color: #e6edf3;
-    background: transparent;
-    border-bottom-color: #0d6efd;
-  }
-
-  &:hover:not(.active) { color: #e6edf3; border-color: transparent; }
-}
-
-// ─── Progress bar container ────────────────────────────────────────────────────
-
-.progress-container {
-  background: #0d1117;
-}
-
-// ─── Cards ────────────────────────────────────────────────────────────────────
-
-.card {
-  background: #161b22;
-}
-
-// ─── Utility: monospace ───────────────────────────────────────────────────────
-
-.font-mono {
-  font-family: $font-family-monospace;
-}
-
-// ─── Column sort button ───────────────────────────────────────────────────────
-
-.col-sort-btn {
-  flex-shrink: 0;
-  cursor: pointer;
-  user-select: none;
-  background: none;
-  border: none;
-  padding: 0;
-  text-align: left;
-  font: inherit;
+.ol-label {
+  font-size: var(--ol-fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ol-text-faint);
 }
