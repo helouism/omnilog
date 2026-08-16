@@ -4,8 +4,6 @@ import { MainPage } from './components/pages/MainPage';
 import { AboutUs } from './components/pages/AboutUs';
 import { PrivacyPolicy } from './components/pages/PrivacyPolicy';
 import { TermsAndConditions } from './components/pages/TermsAndConditions';
-import { BlogList } from './components/pages/BlogList';
-import { BlogPost } from './components/pages/BlogPost';
 import { ContactUs } from './components/pages/ContactUs';
 import { useLogAnalytics } from './hooks/useLogAnalytics';
 
@@ -17,8 +15,6 @@ export default function App() {
       <Navbar state={state} onReset={reset} />
       <Routes>
         <Route path="/" element={<MainPage key={state.fileName ?? ''} state={state} processFile={processFile} reset={reset} />} />
-        <Route path="/blog" element={<BlogList />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsAndConditions />} />

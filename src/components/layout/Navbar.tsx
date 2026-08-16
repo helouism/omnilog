@@ -23,7 +23,6 @@ function formatBytes(bytes: number): string {
 }
 
 const NAV_LINKS = [
-  { label: 'Blog', to: '/blog' },
   { label: 'About', to: '/about' },
   { label: 'Contact', to: '/contact' },
   { label: 'Privacy', to: '/privacy' },
@@ -62,17 +61,6 @@ export function Navbar({ state, onReset }: NavbarProps) {
               {label}
             </Link>
           ))}
-          <a
-            href="https://t.me/omnilogofficial"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted"
-            title="OmniLog on Telegram"
-            aria-label="OmniLog on Telegram"
-            style={{ fontSize: '1rem', lineHeight: 1 }}
-          >
-            <i className="bi bi-telegram" />
-          </a>
         </div>
 
         {isActive && state.format !== 'unknown' && (

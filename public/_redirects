@@ -1,0 +1,7 @@
+# The blog was removed. These URLs were indexed by search engines, so they are
+# 301'd to the homepage rather than falling through to the SPA handler, which
+# would return the app shell with a 200 (a soft 404).
+#
+# Rules are matched in file order, so the exact /blog rule must precede the splat.
+/blog     /  301
+/blog/*   /  301

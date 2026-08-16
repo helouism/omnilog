@@ -62,7 +62,8 @@ File drop → useLogAnalytics hook → new Worker()
 
 **Permitted third-party scripts (already configured in CSP and `index.html`):**
 - `static.cloudflareinsights.com` — Cloudflare Web Analytics (auto-injected by Cloudflare, no code needed)
-- `ss.mrmnd.com` — Mondiad ads (`index.html` script tags `native.js` + `banner.js`). Ad slots are rendered only on blog pages via the `MondiadAd` component (`src/components/ads/MondiadAd.tsx`) — never on the main analytics UI. `img-src` is broadened to `https:` in the CSP so ad creatives load.
+
+No advertising scripts. Do not add ad networks or re-broaden the CSP for them.
 
 ### Memory Budget
 - Tab RAM must stay ≤ 500 MB regardless of file size
@@ -78,10 +79,6 @@ File drop → useLogAnalytics hook → new Worker()
 ```
 src/
 ├── types/log.types.ts          — All TypeScript interfaces
-├── content/
-│   ├── posts.ts                — Blog post registry + getPostContent() loader
-│   └── blog/
-│       └── *.md                — One markdown file per blog post (no frontmatter)
 ├── core/
 │   ├── parsers/                — One file per log format
 │   ├── workers/logProcessor.worker.ts
@@ -94,45 +91,30 @@ src/
 │   ├── table/                  — VirtualLogTable, FilterBar
 │   └── pages/
 │       ├── MainPage.tsx        — Main analytics UI (extracted from App.tsx)
-│       ├── BlogList.tsx        — /blog route
-│       ├── BlogPost.tsx        — /blog/:slug route
 │       ├── AboutUs.tsx
+│       ├── ContactUs.tsx
 │       ├── PrivacyPolicy.tsx
 │       └── TermsAndConditions.tsx
-└── assets/main.scss            — Bootstrap 5.3 dark theme + .blog-content styles
+└── assets/main.scss            — Bootstrap 5.3 dark theme
 ```
 
 ## Routing
 
-React Router v6 (`BrowserRouter` in `main.tsx`, `Routes`/`Route` in `App.tsx`). Cloudflare Workers Assets handles SPA fallback via `"not_found_handling": "single-page-application"` in `wrangler.jsonc` — no `_redirects` file needed.
+React Router v6 (`BrowserRouter` in `main.tsx`, `Routes`/`Route` in `App.tsx`). Cloudflare Workers Assets handles SPA fallback via `"not_found_handling": "single-page-application"` in `wrangler.jsonc`.
+
+`public/_redirects` exists only to 301 the removed `/blog` URLs to `/`. It is not needed for routing — without a rule, an unknown path falls through to the SPA handler and returns the app shell with a 200. Add a rule there when a public URL is retired, so search engines get a real 301 instead of a soft 404.
 
 | Route | Component |
 |---|---|
 | `/` | `MainPage` — analytics UI |
-| `/blog` | `BlogList` — post index |
-| `/blog/:slug` | `BlogPost` — rendered markdown |
 | `/about` | `AboutUs` |
+| `/contact` | `ContactUs` |
 | `/privacy` | `PrivacyPolicy` |
 | `/terms` | `TermsAndConditions` |
 
+Each route is also prerendered to static HTML at build time by `scripts/prerender.mjs` — add a `ROUTES` entry there (and a `<url>` in `public/sitemap.xml`) when adding a new page.
+
 The Navbar is rendered outside `<Routes>` so it persists on all pages. Analytics state (`useLogAnalytics`) lives in `App.tsx` and is passed as props to `MainPage` and `Navbar`.
-
-## Adding a Blog Post
-
-1. Create `src/content/blog/<slug>.md` — plain markdown, no frontmatter.
-2. Add an entry to the `POSTS` array in `src/content/posts.ts`:
-   ```ts
-   {
-     slug: '<slug>',          // must match the filename
-     title: '...',
-     date: 'YYYY-MM-DD',
-     description: '...',
-     readingTime: 'N min read',
-     tags: ['...'],
-   }
-   ```
-3. `import.meta.glob` picks up the new file automatically at build time — no other changes needed.
-4. Add a `<url>` entry to `public/sitemap.xml` with the full URL `https://omnilog.my.id/blog/<slug>`, today's date as `lastmod`, `changefreq: monthly`, and `priority: 0.7`. Also update the `<lastmod>` on the `/blog` index entry to today's date.
 
 ## Adding a New Parser
 

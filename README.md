@@ -6,7 +6,7 @@ Privacy-first log analytics that runs **100% in your browser**. Parse and visual
 
 ## Features
 
-- **Zero-egress** — log data never leaves your machine. CSP enforces strict `script-src` and `connect-src` in production; outbound connections are limited to Cloudflare Analytics and Mondiad ads.
+- **Zero-egress** — log data never leaves your machine. CSP enforces strict `script-src` and `connect-src` in production; the only permitted outbound connection is Cloudflare Web Analytics.
 - **Multi-format detection** — auto-detects NGINX, Apache, UFW, Syslog, and generic log formats using confidence scoring.
 - **Streaming Web Worker** — files are read in 50 MB chunks on a background thread, keeping the UI at 60 FPS regardless of file size.
 - **Live dashboard** — request/error trend, HTTP status distribution, top 10 source IPs, severity breakdown, and stat cards — all update progressively as the file is parsed.
@@ -14,7 +14,6 @@ Privacy-first log analytics that runs **100% in your browser**. Parse and visual
 - **Virtual log table** — renders millions of rows without DOM overhead via `@tanstack/react-virtual`. Supports full-text search, regex, severity filter, and sortable columns.
 - **CSV export** — export filtered & sorted log entries to CSV in one click.
 - **IndexedDB session persistence** — last parsed file is restored on page reload.
-- **Blog** — static markdown-based blog at `/blog`; posts are bundled at build time via `import.meta.glob`, rendered with `react-markdown` + `remark-gfm`.
 
 ## Supported Formats
 
@@ -48,7 +47,6 @@ npx tsc --noEmit
 | Routing | React Router v6 |
 | Charts | Chart.js 4, react-chartjs-2 |
 | Virtual list | @tanstack/react-virtual |
-| Blog | react-markdown, remark-gfm |
 | Bundler | Vite 8 |
 | Language | TypeScript 6 |
 | PWA | vite-plugin-pwa + Workbox |
@@ -76,7 +74,7 @@ File drop → useLogAnalytics hook → Web Worker
 - All app assets are bundled locally; no CDN dependencies for the app shell
 - Service Worker uses Cache-First for all app shell assets
 - **Cloudflare Web Analytics** — cookieless, aggregate traffic metrics only (page views, country, browser). No personal data collected.
-- **Mondiad** — serves native and banner display ads on blog pages only; may use cookies for ad delivery per [Mondiad's Privacy Policy](https://mondiad.com/privacy-policy/)
+- No advertising and no third-party ad scripts
 
 ## License
 

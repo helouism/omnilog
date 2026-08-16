@@ -26,7 +26,7 @@ export function PrivacyPolicy() {
 
         <div className="mb-4">
           <h1 className="fw-bold mb-1" style={{ fontSize: '1.75rem' }}>Privacy Policy</h1>
-          <span className="text-muted small">Last updated: June 2026</span>
+          <span className="text-muted small">Last updated: August 2026</span>
         </div>
 
         <Section title="1. Information We Collect">
@@ -38,9 +38,9 @@ export function PrivacyPolicy() {
             file contents are never uploaded or transmitted anywhere.</strong>
           </p>
           <p>
-            The site does load third-party analytics and advertising scripts (described in Section 4). These
-            make their own network requests and may collect standard browsing data, but they have no access to
-            the contents of the log files you analyse.
+            The site does load a third-party analytics script (described in Section 4). It makes its own network
+            requests and collects aggregate traffic data, but it has no access to the contents of the log files
+            you analyse.
           </p>
         </Section>
 
@@ -64,7 +64,7 @@ export function PrivacyPolicy() {
         </Section>
 
         <Section title="4. Third-Party Services">
-          <p>OmniLog uses two third-party services. Neither has access to the contents of your log files.</p>
+          <p>OmniLog uses one third-party service. It has no access to the contents of your log files.</p>
 
           <p><strong className="text-light">Cloudflare Web Analytics</strong></p>
           <p>
@@ -75,19 +75,9 @@ export function PrivacyPolicy() {
             <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer" className="text-info">Privacy Policy</a>.
           </p>
 
-          <p><strong className="text-light">Mondiad (Advertising)</strong></p>
           <p>
-            We display advertisements served by Mondiad on our blog pages. Mondiad and its advertising partners
-            may use cookies and similar technologies to serve and measure ads, which can include data such as your
-            IP address, approximate location, device, and browsing activity. These ad scripts run only in your
-            browser and never receive the contents of any log file you analyse. Mondiad's data practices are
-            governed by the{' '}
-            <a href="https://mondiad.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-info">Mondiad Privacy Policy</a>.
-          </p>
-
-          <p>
-            Aside from the analytics and advertising services named above, no other third-party services are used.
-            There is no error reporting and no social media widgets.
+            Aside from the analytics service named above, no other third-party services are used.
+            There is no advertising, no error reporting, and no social media widgets.
           </p>
         </Section>
 
