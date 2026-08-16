@@ -74,6 +74,20 @@ No advertising scripts. Do not add ad networks or re-broaden the CSP for them.
 - No synchronous heavy loops on the main thread
 - Filter operations on `entries[]` in `VirtualLogTable` are acceptable (runs on render, not in Worker) but must stay fast via `useMemo`
 
+### Initial Bundle
+Charts are behind a `React.lazy` boundary in `MainPage.tsx`, so chart.js must not be
+loaded on first paint. Two things in `vite.config.ts` can silently break that:
+
+- **Do not give chart.js a `manualChunks` name.** A named manual chunk gets a
+  `<link rel="modulepreload">` in the entry HTML, so every route — including `/about`
+  and `/privacy`, which never draw a chart — downloads and compiles it up front.
+- **Match `manualChunks` on a full package-directory boundary.** A bare
+  `id.includes('node_modules/react')` also matches `react-chartjs-2` and drags chart.js
+  into the eagerly-preloaded `react-vendor` chunk.
+
+After changing `manualChunks`, check `grep modulepreload dist/index.html` — only the
+runtime, react, virtual, and idb vendor chunks belong there.
+
 ## Directory Structure
 
 ```
@@ -82,12 +96,14 @@ src/
 ├── core/
 │   ├── parsers/                — One file per log format
 │   ├── workers/logProcessor.worker.ts
+│   ├── dateFilter.ts           — Reducer/state for the dashboard date-range toolbar
 │   └── idbStorage.ts           — IndexedDB CRUD
 ├── hooks/useLogAnalytics.ts    — Worker ↔ React state bridge
 ├── components/
 │   ├── layout/                 — Navbar (uses react-router-dom Link/useNavigate)
 │   ├── uploader/               — Dropzone
-│   ├── dashboard/              — Charts, StatCards, ProgressBar
+│   ├── landing/                — LandingView: the idle-state marketing view
+│   ├── dashboard/              — Charts, StatCards, ProgressBar, DateRangeFilter
 │   ├── table/                  — VirtualLogTable, FilterBar
 │   └── pages/
 │       ├── MainPage.tsx        — Main analytics UI (extracted from App.tsx)

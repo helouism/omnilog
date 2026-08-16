@@ -103,7 +103,10 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
     let result = entries;
 
     if (filter.severities.length > 0) {
-      result = result.filter(e => filter.severities.includes(e.severity));
+      // Built once per filter change rather than rescanned for each of the
+      // (potentially millions of) entries.
+      const selected = new Set(filter.severities);
+      result = result.filter(e => selected.has(e.severity));
     }
 
     if (filter.query) {

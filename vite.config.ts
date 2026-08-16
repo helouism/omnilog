@@ -21,12 +21,21 @@ export default defineConfig({
     target: 'es2020',
     rollupOptions: {
       output: {
+        // Match on a full package-directory boundary. A bare `includes('node_modules/react')`
+        // also matches `node_modules/react-chartjs-2`, which dragged chart.js into the
+        // eagerly-preloaded react-vendor chunk.
+        //
+        // chart.js / react-chartjs-2 are deliberately absent: naming a manual chunk for them
+        // makes Vite emit a <link rel="modulepreload"> for it in the entry HTML, so every
+        // page — including /about and /privacy, which never draw a chart — downloaded and
+        // compiled ~198 kB of chart code up front, defeating the React.lazy boundary in
+        // MainPage. Left unlisted, they land in the async Charts chunk instead.
         manualChunks(id) {
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) return 'react-vendor';
-          if (id.includes('node_modules/chart.js') || id.includes('node_modules/react-chartjs-2')) return 'chart-vendor';
-          if (id.includes('node_modules/@tanstack')) return 'virtual-vendor';
-          if (id.includes('node_modules/idb')) return 'idb-vendor';
-          if (id.includes('node_modules/react-markdown') || id.includes('node_modules/remark') || id.includes('node_modules/rehype') || id.includes('node_modules/unified') || id.includes('node_modules/micromark') || id.includes('node_modules/mdast') || id.includes('node_modules/hast')) return 'markdown-vendor';
+          if (!id.includes('node_modules/')) return;
+          if (/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) return 'react-vendor';
+          if (/node_modules\/@tanstack\//.test(id)) return 'virtual-vendor';
+          if (/node_modules\/idb\//.test(id)) return 'idb-vendor';
+          if (/node_modules\/(react-markdown|remark|rehype|unified|micromark|mdast|hast)[^/]*\//.test(id)) return 'markdown-vendor';
         },
       },
     },
