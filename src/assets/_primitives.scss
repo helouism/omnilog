@@ -1,1 +1,310 @@
-// Primitives — populated in Task 4.
+// ─────────────────────────────────────────────────────────────────────────────
+// OmniLog primitives. All values come from custom properties in _tokens.scss.
+// These replace Bootstrap's opinionated component classes (card, badge, btn,
+// nav-tabs, table-dark). Bootstrap's grid and layout utilities are still used.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Panel: a genuinely independent surface (charts) ─────────────────────────
+
+.ol-panel {
+  background: var(--ol-surface-1);
+  border: 1px solid var(--ol-border);
+  border-radius: var(--ol-r-lg);
+}
+
+.ol-panel-pad { padding: var(--ol-sp-4); }
+
+// ─── Hairline grid: cells sharing dividers inside one container ──────────────
+// This is the core visual device. Cells never float; they share edges.
+
+.ol-grid {
+  display: grid;
+  background: var(--ol-border-subtle); // shows through as the hairlines
+  border: 1px solid var(--ol-border);
+  border-radius: var(--ol-r-lg);
+  overflow: hidden;
+  gap: 1px;
+}
+
+.ol-grid-cell {
+  background: var(--ol-surface-1);
+  padding: var(--ol-sp-4);
+}
+
+// ─── Stat cell ───────────────────────────────────────────────────────────────
+
+.ol-stat-label {
+  font-size: var(--ol-fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ol-text-faint);
+  margin-bottom: var(--ol-sp-2);
+}
+
+.ol-stat-value {
+  font-size: var(--ol-fs-2xl);
+  font-weight: 600;
+  letter-spacing: -0.021em;
+  line-height: var(--ol-lh-heading);
+  color: var(--ol-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.ol-stat-sub {
+  font-size: var(--ol-fs-xs);
+  color: var(--ol-text-dim);
+  margin-top: var(--ol-sp-1);
+}
+
+// Only ever applied to the error stat, and only when the count is non-zero.
+.ol-stat-value--alert { color: var(--ol-sev-error); }
+
+// ─── Chip (replaces .badge) ──────────────────────────────────────────────────
+
+.ol-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ol-sp-1);
+  font-size: var(--ol-fs-2xs);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--ol-r-sm);
+  border: 1px solid transparent;
+  background: var(--ol-surface-2);
+  color: var(--ol-text-dim);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@each $name in (trace, debug, info, warn, error, fatal, unknown) {
+  .ol-chip--#{$name} {
+    color: var(--ol-sev-#{$name});
+    border-color: var(--ol-sev-#{$name});
+    background: color-mix(in srgb, var(--ol-sev-#{$name}) 12%, transparent);
+  }
+}
+
+.ol-chip--accent {
+  color: var(--ol-accent);
+  border-color: var(--ol-accent);
+  background: var(--ol-accent-wash);
+}
+
+// ─── Buttons ─────────────────────────────────────────────────────────────────
+
+.ol-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ol-sp-2);
+  font: inherit;
+  font-size: var(--ol-fs-xs);
+  font-weight: 500;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--ol-r-md);
+  border: 1px solid var(--ol-border);
+  background: var(--ol-surface-2);
+  color: var(--ol-text-dim);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    color: var(--ol-text);
+    border-color: var(--ol-border-strong);
+  }
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.ol-btn--primary {
+  background: var(--ol-accent);
+  border-color: var(--ol-accent);
+  color: var(--ol-on-accent);
+  font-weight: 600;
+  &:hover:not(:disabled) { filter: brightness(1.1); color: var(--ol-on-accent); }
+}
+
+.ol-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  &:hover:not(:disabled) { background: var(--ol-surface-2); }
+}
+
+.ol-btn--sm { padding: 0.2rem 0.5rem; font-size: var(--ol-fs-2xs); }
+
+.ol-btn--icon { padding: 0.3rem; }
+
+// ─── Tabs ────────────────────────────────────────────────────────────────────
+
+.ol-tabs {
+  display: flex;
+  gap: var(--ol-sp-1);
+  border-bottom: 1px solid var(--ol-border);
+}
+
+.ol-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ol-sp-2);
+  font: inherit;
+  font-size: var(--ol-fs-sm);
+  font-weight: 500;
+  padding: var(--ol-sp-3) var(--ol-sp-4);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--ol-text-faint);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &:hover { color: var(--ol-text); }
+
+  &.is-active {
+    color: var(--ol-text);
+    border-bottom-color: var(--ol-accent);
+  }
+}
+
+// ─── Toolbar (sticky dashboard controls) ─────────────────────────────────────
+
+.ol-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--ol-sp-3);
+  padding: var(--ol-sp-3) var(--ol-sp-4);
+  background: var(--ol-surface-2);
+  border-bottom: 1px solid var(--ol-border);
+}
+
+// ─── Segmented control (chart granularity) ───────────────────────────────────
+
+.ol-seg {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  background: var(--ol-surface-2);
+  border: 1px solid var(--ol-border);
+  border-radius: var(--ol-r-md);
+}
+
+.ol-seg-item {
+  font: inherit;
+  font-size: var(--ol-fs-2xs);
+  font-weight: 500;
+  padding: 0.15rem 0.5rem;
+  border: none;
+  border-radius: var(--ol-r-sm);
+  background: transparent;
+  color: var(--ol-text-faint);
+  cursor: pointer;
+
+  &:hover { color: var(--ol-text); }
+  &.is-active { background: var(--ol-border); color: var(--ol-text); }
+}
+
+// ─── Inputs ──────────────────────────────────────────────────────────────────
+
+.ol-input {
+  font: inherit;
+  font-size: var(--ol-fs-xs);
+  padding: 0.3rem 0.55rem;
+  background: var(--ol-bg);
+  border: 1px solid var(--ol-border);
+  border-radius: var(--ol-r-md);
+  color: var(--ol-text);
+  color-scheme: dark;
+
+  &::placeholder { color: var(--ol-text-faint); }
+  &:focus {
+    outline: none;
+    border-color: var(--ol-accent);
+    box-shadow: 0 0 0 3px var(--ol-accent-wash);
+  }
+}
+
+// ─── Dropzone ────────────────────────────────────────────────────────────────
+
+.ol-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ol-sp-3);
+  width: 100%;
+  padding: var(--ol-sp-7) var(--ol-sp-5);
+  font: inherit;
+  color: var(--ol-text);
+  background: var(--ol-surface-1);
+  border: 1px solid var(--ol-border);
+  border-radius: var(--ol-r-xl);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.18s ease, background 0.18s ease;
+
+  &:hover { border-color: var(--ol-border-strong); }
+
+  &.is-active {
+    border-color: var(--ol-accent);
+    background: var(--ol-accent-wash);
+  }
+}
+
+.ol-dropzone-icon {
+  color: var(--ol-text-faint);
+  transition: color 0.18s ease, transform 0.18s ease;
+
+  .ol-dropzone.is-active & {
+    color: var(--ol-accent);
+    transform: translateY(-3px);
+  }
+}
+
+// ─── Table ───────────────────────────────────────────────────────────────────
+
+.ol-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: var(--ol-sp-2) var(--ol-sp-4);
+  background: var(--ol-surface-2);
+  border-bottom: 1px solid var(--ol-border);
+  font-size: var(--ol-fs-2xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ol-text-faint);
+}
+
+.ol-row {
+  border-bottom: 1px solid var(--ol-border-subtle);
+  transition: background 0.1s ease;
+  &:hover { background: var(--ol-surface-2); }
+}
+
+.ol-sort-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+
+  &:hover { color: var(--ol-text); }
+  &.is-active { color: var(--ol-text); }
+}
