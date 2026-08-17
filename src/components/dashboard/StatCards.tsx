@@ -9,56 +9,44 @@ function pct(a: number, b: number): string {
   return `${((a / b) * 100).toFixed(1)}%`;
 }
 
+/** Four-cell hairline strip. Deliberately monochrome — the only cell that ever
+ *  takes color is Errors, and only when the count is non-zero. */
 export function StatCards({ agg }: StatCardsProps) {
   const errorCount = agg.severityDistribution
     .filter(s => s.severity === 'ERROR' || s.severity === 'FATAL')
     .reduce((acc, s) => acc + s.count, 0);
 
-  const errorRate = pct(errorCount, agg.parsedLines);
-  const parseRate = pct(agg.parsedLines, agg.totalLines);
-
-  const cards = [
+  const cards: { label: string; value: string; sub?: string; alert?: boolean }[] = [
     {
-      label: 'Total Lines',
+      label: 'Total lines',
       value: agg.totalLines.toLocaleString(),
-      icon: 'bi-list-ul',
-      color: 'text-primary',
     },
     {
       label: 'Parsed',
-      value: `${agg.parsedLines.toLocaleString()} (${parseRate})`,
-      icon: 'bi-check-circle-fill',
-      color: 'text-success',
+      value: agg.parsedLines.toLocaleString(),
+      sub: pct(agg.parsedLines, agg.totalLines),
     },
     {
-      label: 'Errors / Fatal',
-      value: `${errorCount.toLocaleString()} (${errorRate})`,
-      icon: 'bi-exclamation-octagon-fill',
-      color: 'text-danger',
+      label: 'Errors / fatal',
+      value: errorCount.toLocaleString(),
+      sub: pct(errorCount, agg.parsedLines),
+      alert: errorCount > 0,
     },
     {
       label: 'Format',
       value: agg.format.toUpperCase(),
-      icon: 'bi-braces',
-      color: 'text-info',
     },
   ];
 
   return (
-    <div className="row g-3 mb-3">
+    <div className="ol-grid ol-grid--quad mb-4">
       {cards.map(card => (
-        <div className="col-6 col-md-3" key={card.label}>
-          <div className="card bg-dark border-secondary h-100">
-            <div className="card-body p-3">
-              <div className="d-flex align-items-start justify-content-between">
-                <div>
-                  <div className="text-muted small mb-1">{card.label}</div>
-                  <div className="fw-semibold">{card.value}</div>
-                </div>
-                <i className={`bi ${card.icon} ${card.color} fs-5 opacity-75`} />
-              </div>
-            </div>
+        <div className="ol-grid-cell" key={card.label}>
+          <div className="ol-stat-label">{card.label}</div>
+          <div className={`ol-stat-value ${card.alert ? 'ol-stat-value--alert' : ''}`}>
+            {card.value}
           </div>
+          {card.sub && <div className="ol-stat-sub">{card.sub}</div>}
         </div>
       ))}
     </div>
