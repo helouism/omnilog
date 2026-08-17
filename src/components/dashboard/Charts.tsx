@@ -99,8 +99,10 @@ function useChartTokens(): TokenReader {
 }
 
 /**
- * Shared chart.js options. A function rather than a module constant because
- * every color it carries now comes from the token reader.
+ * Options common to every chart type, axes excluded. The doughnut consumes this
+ * one directly: it has no cartesian axes, and chart.js's mergeScaleConfig
+ * iterates Object.keys(options.scales), so handing it `scales` would materialise
+ * an x and a y on a chart type that has neither.
  *
  * `satisfies` rather than a return-type annotation, deliberately. An annotation
  * would widen the result to ChartOptions, whose `scales` is optional — and
@@ -110,7 +112,7 @@ function useChartTokens(): TokenReader {
  * precise inferred type callers rely on. Without either, a returned literal
  * loses its freshness and gets no excess-property check at all.
  */
-function chartDefaults(t: TokenReader) {
+function baseOptions(t: TokenReader) {
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -120,6 +122,13 @@ function chartDefaults(t: TokenReader) {
         labels: { color: t('--ol-text-dim'), font: { size: 11 } },
       },
     },
+  } satisfies ChartOptions<'line' | 'bar' | 'doughnut'>;
+}
+
+/** baseOptions plus the shared cartesian axes, for the line and bar charts. */
+function chartDefaults(t: TokenReader) {
+  return {
+    ...baseOptions(t),
     scales: {
       x: {
         ticks: { color: t('--ol-text-faint'), maxTicksLimit: 8, font: { size: 10 } },
@@ -294,8 +303,6 @@ export function StatusDistributionChart({ agg }: ChartsProps) {
   const t = useChartTokens();
   if (!agg.statusDistribution.length) return null;
 
-  const { scales: _scales, ...doughnutOptions } = chartDefaults(t);
-
   const STATUS_FILL: Record<string, string> = {
     '2xx': t('--ol-status-2xx-fill'),
     '3xx': t('--ol-status-3xx-fill'),
@@ -319,14 +326,12 @@ export function StatusDistributionChart({ agg }: ChartsProps) {
     <div className="ol-panel ol-panel-pad h-100">
       <div className="ol-label mb-3">HTTP status distribution</div>
       <div style={{ height: 220 }} className="d-flex justify-content-center">
-        {/* Derived from chartDefaults rather than hand-rolled, so the shared
-            animation and legend styling cannot drift — but `scales` MUST be
-            dropped, not passed through: chart.js's mergeScaleConfig iterates
-            Object.keys(options.scales) and would materialise x/y scales on a
-            doughnut, which has none. */}
+        {/* baseOptions, not chartDefaults: shares the animation and legend
+            styling so they cannot drift, while leaving out `scales`, which a
+            doughnut must never receive. See the note on baseOptions. */}
         <Doughnut
           data={data}
-          options={doughnutOptions}
+          options={baseOptions(t)}
           aria-label="Doughnut chart of log entries grouped by HTTP status class"
         />
       </div>
