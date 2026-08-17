@@ -63,6 +63,10 @@
 // ─── Chip (replaces .badge) ──────────────────────────────────────────────────
 
 .ol-chip {
+  // inline-flex + gap is load-bearing, not just alignment: chips whose content is
+  // a bare text run followed by a <span> (the navbar format chip) rely on the text
+  // becoming an anonymous flex item so this gap separates them. Switching to
+  // inline-block would silently render "NGINX92%".
   display: inline-flex;
   align-items: center;
   gap: var(--ol-sp-1);
@@ -91,6 +95,31 @@
   border-color: var(--ol-accent);
   background: var(--ol-accent-wash);
 }
+
+// ─── Nav link ────────────────────────────────────────────────────────────────
+// Deliberately NOT combined with Bootstrap's .text-decoration-none: that class is
+// !important and would kill main.scss's `a:hover { text-decoration: underline }`,
+// leaving the links with no hover affordance at all. Here the resting state is
+// undecorated (0,1,0) and the global a:hover (0,1,1) still wins on hover, so the
+// links gain both an underline and the brightening below.
+
+.ol-navlink {
+  font-size: var(--ol-fs-xs);
+  color: var(--ol-text-dim);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 120ms ease;
+
+  &:hover,
+  &:focus-visible,
+  &[aria-current='page'] { color: var(--ol-text); }
+}
+
+// The navigation recedes while an analysis is running, but never below the AA
+// floor: --ol-text-faint measures 5.39:1 on --ol-bg. Equal specificity to
+// .ol-navlink and declared after it, so it wins the resting colour; the
+// :hover/:focus-visible/[aria-current] rules above are more specific and still win.
+.ol-navlink--dim { color: var(--ol-text-faint); }
 
 // ─── Buttons ─────────────────────────────────────────────────────────────────
 
