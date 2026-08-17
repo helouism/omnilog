@@ -26,26 +26,82 @@ ChartJS.register(
   Filler,
 );
 
-const CHART_DEFAULTS = {
-  responsive: true,
-  maintainAspectRatio: false,
-  animation: { duration: 300 } as const,
-  plugins: {
-    legend: {
-      labels: { color: '#adb5bd', font: { size: 11 } },
-    },
-  },
-  scales: {
-    x: {
-      ticks: { color: '#6c757d', maxTicksLimit: 8, font: { size: 10 } },
-      grid: { color: 'rgba(255,255,255,0.05)' },
-    },
-    y: {
-      ticks: { color: '#6c757d', font: { size: 10 } },
-      grid: { color: 'rgba(255,255,255,0.05)' },
-    },
-  },
+/**
+ * Chart palette, read from the CSS custom properties in _tokens.scss so there
+ * is one source of truth for color.
+ *
+ * The fallback is REQUIRED, not defensive: scripts/prerender.mjs renders every
+ * route through renderToString with no DOM, where getComputedStyle is
+ * unavailable. Keep these values in sync with src/assets/_tokens.scss.
+ */
+const TOKEN_FALLBACK: Record<string, string> = {
+  '--ol-text-dim': '#98a2b0',
+  '--ol-text-faint': '#7d8797',
+  '--ol-surface-1': '#12151b',
+  '--ol-grid-line': 'rgba(255,255,255,0.05)',
+  '--ol-accent': '#58a6ff',
+  '--ol-accent-fill': 'rgba(88,166,255,0.55)',
+  '--ol-sev-trace': '#78838f',
+  '--ol-sev-debug': '#8b95a3',
+  '--ol-sev-info': '#6e9fd4',
+  '--ol-sev-warn': '#d9a441',
+  '--ol-sev-error': '#e5534b',
+  '--ol-sev-fatal': '#a371f7',
+  '--ol-sev-unknown': '#7d8797',
+  '--ol-sev-trace-fill': 'rgba(120,131,143,0.55)',
+  '--ol-sev-debug-fill': 'rgba(139,149,163,0.55)',
+  '--ol-sev-info-fill': 'rgba(110,159,212,0.55)',
+  '--ol-sev-warn-fill': 'rgba(217,164,65,0.55)',
+  '--ol-sev-error-fill': 'rgba(229,83,75,0.55)',
+  '--ol-sev-fatal-fill': 'rgba(163,113,247,0.55)',
+  '--ol-sev-unknown-fill': 'rgba(125,135,151,0.55)',
+  '--ol-status-2xx-fill': 'rgba(63,185,80,0.55)',
+  '--ol-status-3xx-fill': 'rgba(110,159,212,0.55)',
+  '--ol-status-4xx-fill': 'rgba(217,164,65,0.55)',
+  '--ol-status-5xx-fill': 'rgba(229,83,75,0.55)',
 };
+
+type TokenReader = (name: string) => string;
+
+function useChartTokens(): TokenReader {
+  return useMemo(() => {
+    let computed: CSSStyleDeclaration | null = null;
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      computed = getComputedStyle(document.documentElement);
+    }
+    return (name: string) => {
+      const v = computed?.getPropertyValue(name).trim();
+      return v || TOKEN_FALLBACK[name] || '#000000';
+    };
+  }, []);
+}
+
+/**
+ * Shared chart.js options. A function rather than a module constant because
+ * every color it carries now comes from the token reader.
+ */
+function chartDefaults(t: TokenReader) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 300 } as const,
+    plugins: {
+      legend: {
+        labels: { color: t('--ol-text-dim'), font: { size: 11 } },
+      },
+    },
+    scales: {
+      x: {
+        ticks: { color: t('--ol-text-faint'), maxTicksLimit: 8, font: { size: 10 } },
+        grid: { color: t('--ol-grid-line') },
+      },
+      y: {
+        ticks: { color: t('--ol-text-faint'), font: { size: 10 } },
+        grid: { color: t('--ol-grid-line') },
+      },
+    },
+  };
+}
 
 interface ChartsProps {
   agg: AggregationResult;
@@ -61,6 +117,7 @@ const GRANULARITY_OPTIONS: { value: Granularity; label: string }[] = [
 
 export function TimeSeriesChart({ agg }: ChartsProps) {
   const [granularity, setGranularity] = useState<Granularity>('minute');
+  const t = useChartTokens();
 
   const { labels, requestData, errorData } = useMemo(() => {
     if (granularity === 'minute') {
@@ -96,8 +153,8 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
       {
         label: 'Requests',
         data: requestData,
-        borderColor: '#0d6efd',
-        backgroundColor: 'rgba(13,110,253,0.1)',
+        borderColor: t('--ol-accent'),
+        backgroundColor: t('--ol-accent-fill'),
         fill: true,
         tension: 0.3,
         pointRadius: labels.length > 200 ? 0 : 2,
@@ -106,8 +163,8 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
       {
         label: 'Errors',
         data: errorData,
-        borderColor: '#dc3545',
-        backgroundColor: 'rgba(220,53,69,0.1)',
+        borderColor: t('--ol-sev-error'),
+        backgroundColor: t('--ol-sev-error-fill'),
         fill: true,
         tension: 0.3,
         pointRadius: labels.length > 200 ? 0 : 2,
@@ -117,125 +174,120 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
   };
 
   return (
-    <div className="card bg-dark border-secondary mb-3">
-      <div className="card-body p-3">
-        <div className="d-flex align-items-center justify-content-between mb-3">
-          <h6 className="card-title text-secondary small mb-0">
-            <i className="bi bi-graph-up me-2" />Request / Error Trend
-          </h6>
-          <div className="btn-group btn-group-sm">
-            {GRANULARITY_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                className={`btn btn-xs px-2 py-0 ${granularity === opt.value ? 'btn-primary' : 'btn-outline-secondary'}`}
-                style={{ fontSize: '0.75rem' }}
-                onClick={() => setGranularity(opt.value)}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
+    <div className="ol-panel ol-panel-pad h-100">
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <div className="ol-label">Request / error trend</div>
+        <div className="ol-seg">
+          {GRANULARITY_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`ol-seg-item ${granularity === opt.value ? 'is-active' : ''}`}
+              onClick={() => setGranularity(opt.value)}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
-        <div style={{ height: 180 }}>
-          <Line data={data} options={CHART_DEFAULTS} />
-        </div>
+      </div>
+      <div style={{ height: 220 }}>
+        <Line
+          data={data}
+          options={chartDefaults(t)}
+          role="img"
+          aria-label="Line chart of request and error counts over time"
+        />
       </div>
     </div>
   );
 }
 
 export function TopIPsChart({ agg }: ChartsProps) {
+  const t = useChartTokens();
   if (!agg.topIPs.length) return null;
+  const defaults = chartDefaults(t);
   const data = {
     labels: agg.topIPs.map(d => d.ip),
     datasets: [{
       label: 'Requests',
       data: agg.topIPs.map(d => d.count),
-      backgroundColor: 'rgba(13,110,253,0.7)',
-      borderColor: '#0d6efd',
+      backgroundColor: t('--ol-accent-fill'),
+      borderColor: t('--ol-accent'),
       borderWidth: 1,
       borderRadius: 4,
     }],
   };
 
   return (
-    <div className="card bg-dark border-secondary mb-3">
-      <div className="card-body p-3">
-        <h6 className="card-title text-secondary small mb-3">
-          <i className="bi bi-geo-alt me-2" />Top 10 Source IPs
-        </h6>
-        <div style={{ height: 200 }}>
-          <Bar
-            data={data}
-            options={{
-              ...CHART_DEFAULTS,
-              indexAxis: 'y' as const,
-              plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } },
-              scales: {
-                x: CHART_DEFAULTS.scales.x,
-                y: { ticks: { color: '#adb5bd', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+    <div className="ol-panel ol-panel-pad h-100">
+      <div className="ol-label mb-3">Top 10 source IPs</div>
+      <div style={{ height: 200 }}>
+        <Bar
+          data={data}
+          options={{
+            ...defaults,
+            indexAxis: 'y' as const,
+            plugins: { ...defaults.plugins, legend: { display: false } },
+            scales: {
+              x: defaults.scales.x,
+              y: {
+                ticks: { color: t('--ol-text-dim'), font: { size: 10 } },
+                grid: { color: t('--ol-grid-line') },
               },
-            }}
-          />
-        </div>
+            },
+          }}
+          role="img"
+          aria-label="Horizontal bar chart of the ten source IP addresses with the most requests"
+        />
       </div>
     </div>
   );
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  '2xx': '#198754',
-  '3xx': '#0dcaf0',
-  '4xx': '#ffc107',
-  '5xx': '#dc3545',
-};
-
 export function StatusDistributionChart({ agg }: ChartsProps) {
+  const t = useChartTokens();
   if (!agg.statusDistribution.length) return null;
+
+  const STATUS_FILL: Record<string, string> = {
+    '2xx': t('--ol-status-2xx-fill'),
+    '3xx': t('--ol-status-3xx-fill'),
+    '4xx': t('--ol-status-4xx-fill'),
+    '5xx': t('--ol-status-5xx-fill'),
+  };
+
   const data = {
     labels: agg.statusDistribution.map(d => d.status),
     datasets: [{
       data: agg.statusDistribution.map(d => d.count),
-      backgroundColor: agg.statusDistribution.map(d => STATUS_COLORS[d.status] ?? '#6c757d'),
-      borderColor: '#1a1d21',
+      backgroundColor: agg.statusDistribution.map(
+        d => STATUS_FILL[d.status] ?? t('--ol-sev-unknown-fill'),
+      ),
+      borderColor: t('--ol-surface-1'),
       borderWidth: 2,
     }],
   };
 
   return (
-    <div className="card bg-dark border-secondary mb-3">
-      <div className="card-body p-3">
-        <h6 className="card-title text-secondary small mb-3">
-          <i className="bi bi-pie-chart me-2" />HTTP Status Distribution
-        </h6>
-        <div style={{ height: 180 }} className="d-flex justify-content-center">
-          <Doughnut
-            data={data}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              animation: { duration: 300 },
-              plugins: {
-                legend: { labels: { color: '#adb5bd', font: { size: 11 } } },
-              },
-            }}
-          />
-        </div>
+    <div className="ol-panel ol-panel-pad h-100">
+      <div className="ol-label mb-3">HTTP status distribution</div>
+      <div style={{ height: 220 }} className="d-flex justify-content-center">
+        <Doughnut
+          data={data}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 300 },
+            plugins: {
+              legend: { labels: { color: t('--ol-text-dim'), font: { size: 11 } } },
+            },
+          }}
+          role="img"
+          aria-label="Doughnut chart of log entries grouped by HTTP status class"
+        />
       </div>
     </div>
   );
 }
-
-const SEVERITY_COLORS: Record<string, string> = {
-  FATAL: '#6f42c1',
-  ERROR: '#dc3545',
-  WARN: '#ffc107',
-  INFO: '#0dcaf0',
-  DEBUG: '#6c757d',
-  TRACE: '#adb5bd',
-  UNKNOWN: '#495057',
-};
 
 export function ChartsGrid({ agg }: ChartsProps) {
   return (
@@ -251,35 +303,48 @@ export function ChartsGrid({ agg }: ChartsProps) {
 export default ChartsGrid;
 
 export function SeverityChart({ agg }: ChartsProps) {
+  const t = useChartTokens();
   if (!agg.severityDistribution.length) return null;
+
+  const SEVERITY_FILL: Record<string, string> = {
+    FATAL: t('--ol-sev-fatal-fill'),
+    ERROR: t('--ol-sev-error-fill'),
+    WARN: t('--ol-sev-warn-fill'),
+    INFO: t('--ol-sev-info-fill'),
+    DEBUG: t('--ol-sev-debug-fill'),
+    TRACE: t('--ol-sev-trace-fill'),
+    UNKNOWN: t('--ol-sev-unknown-fill'),
+  };
+
+  const defaults = chartDefaults(t);
   const sorted = agg.severityDistribution.toSorted((a, b) => b.count - a.count);
   const data = {
     labels: sorted.map(d => d.severity),
     datasets: [{
       label: 'Count',
       data: sorted.map(d => d.count),
-      backgroundColor: sorted.map(d => SEVERITY_COLORS[d.severity] ?? '#6c757d'),
-      borderColor: '#1a1d21',
+      backgroundColor: sorted.map(
+        d => SEVERITY_FILL[d.severity] ?? t('--ol-sev-unknown-fill'),
+      ),
+      borderColor: t('--ol-surface-1'),
       borderWidth: 1,
       borderRadius: 4,
     }],
   };
 
   return (
-    <div className="card bg-dark border-secondary mb-3">
-      <div className="card-body p-3">
-        <h6 className="card-title text-secondary small mb-3">
-          <i className="bi bi-bar-chart me-2" />Severity Distribution
-        </h6>
-        <div style={{ height: 160 }}>
-          <Bar
-            data={data}
-            options={{
-              ...CHART_DEFAULTS,
-              plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } },
-            }}
-          />
-        </div>
+    <div className="ol-panel ol-panel-pad h-100">
+      <div className="ol-label mb-3">Severity distribution</div>
+      <div style={{ height: 200 }}>
+        <Bar
+          data={data}
+          options={{
+            ...defaults,
+            plugins: { ...defaults.plugins, legend: { display: false } },
+          }}
+          role="img"
+          aria-label="Bar chart of log entry counts by severity level"
+        />
       </div>
     </div>
   );
