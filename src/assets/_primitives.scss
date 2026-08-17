@@ -31,6 +31,16 @@
   padding: var(--ol-sp-4);
 }
 
+// 4-item grids only. Steps 1 -> 2 -> 4 columns, never 3: with 4 items a 3-column
+// row leaves one orphan cell, and the container background then shows through the
+// empty track as a solid patch instead of a 1px hairline.
+.ol-grid--quad {
+  grid-template-columns: 1fr;
+
+  @media (min-width: 576px) { grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 992px) { grid-template-columns: repeat(4, 1fr); }
+}
+
 // ─── Stat cell ───────────────────────────────────────────────────────────────
 
 .ol-stat-label {
