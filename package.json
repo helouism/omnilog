@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build && node scripts/prerender.mjs",
     "lint": "eslint .",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "check": "npm run check:contrast && npm run check:tokens",
     "preview": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "doctor": "npx react-doctor@latest"

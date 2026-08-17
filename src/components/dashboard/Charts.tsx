@@ -11,6 +11,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
+import type { ChartOptions } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import type { AggregationResult } from '../../types/log.types';
 
@@ -27,12 +28,20 @@ ChartJS.register(
 );
 
 /**
- * Chart palette, read from the CSS custom properties in _tokens.scss so there
- * is one source of truth for color.
+ * Chart palette mirror, kept in sync with src/assets/_tokens.scss by
+ * `npm run check:tokens`. That check is what earns this map its place as the one
+ * sanctioned exception to the branch rule that no color literal may live outside
+ * _tokens.scss — without it the map would drift silently, since nothing at
+ * runtime reads it today.
  *
- * The fallback is REQUIRED, not defensive: scripts/prerender.mjs renders every
- * route through renderToString with no DOM, where getComputedStyle is
- * unavailable. Keep these values in sync with src/assets/_tokens.scss.
+ * It is insurance for a no-DOM render, NOT a path that currently executes. Being
+ * precise about that matters, because the obvious guess is wrong: this module is
+ * behind React.lazy in MainPage, and prerender only ever reaches the idle
+ * LandingView, so Charts is never evaluated server-side (`grep ol-accent-fill
+ * dist/server/entry-server.js` → 0 hits). A green `npm run build` therefore
+ * proves nothing about the fallback — doubly so because prerender.mjs catches
+ * per-route errors and continues, so a throwing route would not fail the build
+ * at all. The guard exists so that moving the lazy boundary cannot break SSR.
  */
 const TOKEN_FALLBACK: Record<string, string> = {
   '--ol-text-dim': '#98a2b0',
@@ -40,7 +49,8 @@ const TOKEN_FALLBACK: Record<string, string> = {
   '--ol-surface-1': '#12151b',
   '--ol-grid-line': 'rgba(255,255,255,0.05)',
   '--ol-accent': '#58a6ff',
-  '--ol-accent-fill': 'rgba(88,166,255,0.55)',
+  '--ol-accent-fill': 'rgba(88,166,255,0.75)',
+  '--ol-accent-wash': 'rgba(88,166,255,0.08)',
   '--ol-sev-trace': '#78838f',
   '--ol-sev-debug': '#8b95a3',
   '--ol-sev-info': '#6e9fd4',
@@ -48,17 +58,18 @@ const TOKEN_FALLBACK: Record<string, string> = {
   '--ol-sev-error': '#e5534b',
   '--ol-sev-fatal': '#a371f7',
   '--ol-sev-unknown': '#7d8797',
-  '--ol-sev-trace-fill': 'rgba(120,131,143,0.55)',
-  '--ol-sev-debug-fill': 'rgba(139,149,163,0.55)',
-  '--ol-sev-info-fill': 'rgba(110,159,212,0.55)',
-  '--ol-sev-warn-fill': 'rgba(217,164,65,0.55)',
-  '--ol-sev-error-fill': 'rgba(229,83,75,0.55)',
-  '--ol-sev-fatal-fill': 'rgba(163,113,247,0.55)',
-  '--ol-sev-unknown-fill': 'rgba(125,135,151,0.55)',
-  '--ol-status-2xx-fill': 'rgba(63,185,80,0.55)',
-  '--ol-status-3xx-fill': 'rgba(110,159,212,0.55)',
-  '--ol-status-4xx-fill': 'rgba(217,164,65,0.55)',
-  '--ol-status-5xx-fill': 'rgba(229,83,75,0.55)',
+  '--ol-sev-error-wash': 'rgba(229,83,75,0.08)',
+  '--ol-sev-trace-fill': 'rgba(120,131,143,0.75)',
+  '--ol-sev-debug-fill': 'rgba(139,149,163,0.75)',
+  '--ol-sev-info-fill': 'rgba(110,159,212,0.75)',
+  '--ol-sev-warn-fill': 'rgba(217,164,65,0.75)',
+  '--ol-sev-error-fill': 'rgba(229,83,75,0.75)',
+  '--ol-sev-fatal-fill': 'rgba(163,113,247,0.75)',
+  '--ol-sev-unknown-fill': 'rgba(125,135,151,0.75)',
+  '--ol-status-2xx-fill': 'rgba(63,185,80,0.75)',
+  '--ol-status-3xx-fill': 'rgba(110,159,212,0.75)',
+  '--ol-status-4xx-fill': 'rgba(217,164,65,0.75)',
+  '--ol-status-5xx-fill': 'rgba(229,83,75,0.75)',
 };
 
 type TokenReader = (name: string) => string;
@@ -67,11 +78,22 @@ function useChartTokens(): TokenReader {
   return useMemo(() => {
     let computed: CSSStyleDeclaration | null = null;
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      // A live CSSStyleDeclaration, deliberately: getPropertyValue re-resolves
+      // against current computed values rather than replaying a snapshot, so a
+      // token changed at runtime is picked up without re-running this memo.
       computed = getComputedStyle(document.documentElement);
     }
     return (name: string) => {
       const v = computed?.getPropertyValue(name).trim();
-      return v || TOKEN_FALLBACK[name] || '#000000';
+      if (v) return v;
+      const fallback = TOKEN_FALLBACK[name];
+      if (fallback) return fallback;
+      // check:tokens makes this unreachable, so arriving here means a typo
+      // landed without the check running. Fail loudly in dev; in production
+      // degrade to a visible grey rather than black, which would be 1.06:1 on
+      // --ol-surface-1 and simply vanish.
+      if (import.meta.env.DEV) throw new Error(`Charts: unknown design token ${name}`);
+      return TOKEN_FALLBACK['--ol-text-dim'];
     };
   }, []);
 }
@@ -79,12 +101,20 @@ function useChartTokens(): TokenReader {
 /**
  * Shared chart.js options. A function rather than a module constant because
  * every color it carries now comes from the token reader.
+ *
+ * `satisfies` rather than a return-type annotation, deliberately. An annotation
+ * would widen the result to ChartOptions, whose `scales` is optional — and
+ * TopIPsChart reads `defaults.scales.x` directly. `satisfies` validates the
+ * literal against ChartOptions (so a typo like `gird` for `grid`, which chart.js
+ * would silently ignore at runtime, is a compile error) while keeping the
+ * precise inferred type callers rely on. Without either, a returned literal
+ * loses its freshness and gets no excess-property check at all.
  */
 function chartDefaults(t: TokenReader) {
   return {
     responsive: true,
     maintainAspectRatio: false,
-    animation: { duration: 300 } as const,
+    animation: { duration: 300 },
     plugins: {
       legend: {
         labels: { color: t('--ol-text-dim'), font: { size: 11 } },
@@ -100,7 +130,7 @@ function chartDefaults(t: TokenReader) {
         grid: { color: t('--ol-grid-line') },
       },
     },
-  };
+  } satisfies ChartOptions<'line' | 'bar'>;
 }
 
 interface ChartsProps {
@@ -147,6 +177,13 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
     };
   }, [agg.timeSeries, granularity]);
 
+  // Both datasets fill to the origin, so their areas overlap everywhere, and
+  // chart.js paints dataset 0 LAST (_drawDatasets iterates metasets in reverse)
+  // — the requests area lands on top of the errors line. Hence *-wash (8%) here
+  // and not *-fill (75%): at fill weight the errors series, which is the whole
+  // point of the second dataset, drops to 1.63:1 against the blue above it.
+  // The solid borderColor is what carries each series; the area only hints at
+  // volume. See the two-weight note in _tokens.scss.
   const data = {
     labels,
     datasets: [
@@ -154,7 +191,7 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
         label: 'Requests',
         data: requestData,
         borderColor: t('--ol-accent'),
-        backgroundColor: t('--ol-accent-fill'),
+        backgroundColor: t('--ol-accent-wash'),
         fill: true,
         tension: 0.3,
         pointRadius: labels.length > 200 ? 0 : 2,
@@ -164,7 +201,7 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
         label: 'Errors',
         data: errorData,
         borderColor: t('--ol-sev-error'),
-        backgroundColor: t('--ol-sev-error-fill'),
+        backgroundColor: t('--ol-sev-error-wash'),
         fill: true,
         tension: 0.3,
         pointRadius: labels.length > 200 ? 0 : 2,
@@ -177,12 +214,18 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
     <div className="ol-panel ol-panel-pad h-100">
       <div className="d-flex align-items-center justify-content-between mb-3">
         <div className="ol-label">Request / error trend</div>
-        <div className="ol-seg">
+        {/* .is-active is a background swap and nothing else, so the selected
+            granularity is conveyed by color alone. aria-pressed gives assistive
+            tech the state, and role=group with a name explains what the three
+            buttons relate to — otherwise they announce as a bare
+            "Min / Hour / Day". */}
+        <div className="ol-seg" role="group" aria-label="Time bucket granularity">
           {GRANULARITY_OPTIONS.map(opt => (
             <button
               key={opt.value}
               type="button"
               className={`ol-seg-item ${granularity === opt.value ? 'is-active' : ''}`}
+              aria-pressed={granularity === opt.value}
               onClick={() => setGranularity(opt.value)}
             >
               {opt.label}
@@ -191,10 +234,14 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
         </div>
       </div>
       <div style={{ height: 220 }}>
+        {/* No role="img" on any of these four: react-chartjs-2 already sets it on
+            the canvas it renders, and restating it would silently diverge if the
+            library's default ever changed. aria-label IS forwarded (ChartProps
+            extends CanvasHTMLAttributes) and is what makes the canvas legible to
+            assistive tech at all. */}
         <Line
           data={data}
           options={chartDefaults(t)}
-          role="img"
           aria-label="Line chart of request and error counts over time"
         />
       </div>
@@ -236,7 +283,6 @@ export function TopIPsChart({ agg }: ChartsProps) {
               },
             },
           }}
-          role="img"
           aria-label="Horizontal bar chart of the ten source IP addresses with the most requests"
         />
       </div>
@@ -247,6 +293,8 @@ export function TopIPsChart({ agg }: ChartsProps) {
 export function StatusDistributionChart({ agg }: ChartsProps) {
   const t = useChartTokens();
   if (!agg.statusDistribution.length) return null;
+
+  const { scales: _scales, ...doughnutOptions } = chartDefaults(t);
 
   const STATUS_FILL: Record<string, string> = {
     '2xx': t('--ol-status-2xx-fill'),
@@ -271,17 +319,14 @@ export function StatusDistributionChart({ agg }: ChartsProps) {
     <div className="ol-panel ol-panel-pad h-100">
       <div className="ol-label mb-3">HTTP status distribution</div>
       <div style={{ height: 220 }} className="d-flex justify-content-center">
+        {/* Derived from chartDefaults rather than hand-rolled, so the shared
+            animation and legend styling cannot drift — but `scales` MUST be
+            dropped, not passed through: chart.js's mergeScaleConfig iterates
+            Object.keys(options.scales) and would materialise x/y scales on a
+            doughnut, which has none. */}
         <Doughnut
           data={data}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 300 },
-            plugins: {
-              legend: { labels: { color: t('--ol-text-dim'), font: { size: 11 } } },
-            },
-          }}
-          role="img"
+          options={doughnutOptions}
           aria-label="Doughnut chart of log entries grouped by HTTP status class"
         />
       </div>
@@ -342,7 +387,6 @@ export function SeverityChart({ agg }: ChartsProps) {
             ...defaults,
             plugins: { ...defaults.plugins, legend: { display: false } },
           }}
-          role="img"
           aria-label="Bar chart of log entry counts by severity level"
         />
       </div>

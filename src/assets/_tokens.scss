@@ -42,9 +42,28 @@ $ol-status-4xx:     #d9a441;  // 8.21:1
 $ol-status-5xx:     #e5534b;  // 4.99:1
 
 // ─── Custom properties ───────────────────────────────────────────────────────
-// Large areas (chart fills) use the same hue at 55% alpha rather than full
+// Large areas (chart fills) use the same hue at reduced alpha rather than full
 // saturation — a 4px legend swatch and a 300px bar must not read as the same
 // weight of color. chart.js consumes rgba() natively.
+//
+// There are TWO area weights, and they are not interchangeable:
+//
+//   *-fill (75%) — for marks that do NOT overlap: bar bodies, doughnut
+//     segments. These are graphical objects carrying meaning, so WCAG 1.4.11
+//     asks 3:1 against the surface they sit on. 75% is the floor that clears it
+//     for every member of both ramps once composited over --ol-surface-1: the
+//     worst three are sev-trace, sev-error and status-5xx at 3.23–3.26:1, and
+//     at 70% all three fall just under (2.95–2.98:1). Enforced by
+//     `npm run check:contrast`, which composites them rather than trusting the
+//     solid token's ratio.
+//
+//   *-wash (8%) — for marks that DO overlap: the filled areas of the
+//     request/error trend line chart. Both of its datasets fill to the origin,
+//     and chart.js paints dataset 0 last (it iterates metasets in reverse), so
+//     the requests area is drawn over the errors line. At fill weight that
+//     buries the errors series at 1.63:1; at wash weight it stays at 4.38:1.
+//     The signal in that chart is the 1.5px line in the solid token; the area
+//     is only there to hint at volume.
 :root {
   --ol-bg:            #{$ol-bg};
   --ol-surface-1:     #{$ol-surface-1};
@@ -74,22 +93,26 @@ $ol-status-5xx:     #e5534b;  // 4.99:1
   --ol-status-4xx:    #{$ol-status-4xx};
   --ol-status-5xx:    #{$ol-status-5xx};
 
-  // Chart fills — 55% alpha of the matching hue.
-  --ol-sev-trace-fill:   #{rgba($ol-sev-trace, 0.55)};
-  --ol-sev-debug-fill:   #{rgba($ol-sev-debug, 0.55)};
-  --ol-sev-info-fill:    #{rgba($ol-sev-info, 0.55)};
-  --ol-sev-warn-fill:    #{rgba($ol-sev-warn, 0.55)};
-  --ol-sev-error-fill:   #{rgba($ol-sev-error, 0.55)};
-  --ol-sev-fatal-fill:   #{rgba($ol-sev-fatal, 0.55)};
-  --ol-sev-unknown-fill: #{rgba($ol-sev-unknown, 0.55)};
+  // Chart fills — 75% alpha of the matching hue. Non-overlapping marks only.
+  --ol-sev-trace-fill:   #{rgba($ol-sev-trace, 0.75)};
+  --ol-sev-debug-fill:   #{rgba($ol-sev-debug, 0.75)};
+  --ol-sev-info-fill:    #{rgba($ol-sev-info, 0.75)};
+  --ol-sev-warn-fill:    #{rgba($ol-sev-warn, 0.75)};
+  --ol-sev-error-fill:   #{rgba($ol-sev-error, 0.75)};
+  --ol-sev-fatal-fill:   #{rgba($ol-sev-fatal, 0.75)};
+  --ol-sev-unknown-fill: #{rgba($ol-sev-unknown, 0.75)};
 
-  --ol-status-2xx-fill:  #{rgba($ol-status-2xx, 0.55)};
-  --ol-status-3xx-fill:  #{rgba($ol-status-3xx, 0.55)};
-  --ol-status-4xx-fill:  #{rgba($ol-status-4xx, 0.55)};
-  --ol-status-5xx-fill:  #{rgba($ol-status-5xx, 0.55)};
+  --ol-status-2xx-fill:  #{rgba($ol-status-2xx, 0.75)};
+  --ol-status-3xx-fill:  #{rgba($ol-status-3xx, 0.75)};
+  --ol-status-4xx-fill:  #{rgba($ol-status-4xx, 0.75)};
+  --ol-status-5xx-fill:  #{rgba($ol-status-5xx, 0.75)};
 
-  --ol-accent-fill:      #{rgba($ol-accent, 0.55)};
+  --ol-accent-fill:      #{rgba($ol-accent, 0.75)};
+
+  // Chart washes — 8% alpha. Overlapping areas only; see the note above.
   --ol-accent-wash:      #{rgba($ol-accent, 0.08)};
+  --ol-sev-error-wash:   #{rgba($ol-sev-error, 0.08)};
+
   --ol-grid-line:        #{rgba(#ffffff, 0.05)};
 
   // ─── Type scale ───────────────────────────────────────────────────────────
