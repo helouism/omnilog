@@ -2,29 +2,20 @@ import { useRef, useMemo, useState, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import type { LogEntry, FilterState, SeverityLevel } from '../../types/log.types';
 import { FilterBar } from './FilterBar';
+import { ChevronDown, ChevronRight, ChevronUp, ChevronExpand } from '../icons';
 
 interface VirtualLogTableProps {
   entries: LogEntry[];
 }
 
-const SEVERITY_CLASS: Record<SeverityLevel, string> = {
-  FATAL: 'text-purple',
-  ERROR: 'text-danger',
-  WARN: 'text-warning',
-  INFO: 'text-info',
-  DEBUG: 'text-secondary',
-  TRACE: 'text-muted',
-  UNKNOWN: 'text-muted',
-};
-
-const SEVERITY_BADGE: Record<SeverityLevel, string> = {
-  FATAL: 'bg-purple',
-  ERROR: 'bg-danger',
-  WARN: 'bg-warning text-dark',
-  INFO: 'bg-info text-dark',
-  DEBUG: 'bg-secondary',
-  TRACE: 'bg-dark text-muted',
-  UNKNOWN: 'bg-dark text-muted',
+const SEVERITY_CHIP: Record<SeverityLevel, string> = {
+  FATAL: 'ol-chip--fatal',
+  ERROR: 'ol-chip--error',
+  WARN: 'ol-chip--warn',
+  INFO: 'ol-chip--info',
+  DEBUG: 'ol-chip--debug',
+  TRACE: 'ol-chip--trace',
+  UNKNOWN: 'ol-chip--unknown',
 };
 
 const SEVERITY_ORDER: Record<SeverityLevel, number> = {
@@ -67,11 +58,14 @@ function exportCsv(entries: LogEntry[], filename: string) {
   URL.revokeObjectURL(url);
 }
 
+// No opacity on the inactive icon: .ol-sort-btn inherits --ol-text-faint from
+// .ol-table-head and brightens to --ol-text via .is-active, so the active/inactive
+// contrast is already carried by colour. Spacing comes from .ol-sort-btn's gap.
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
-  if (!active) return <i className="bi bi-chevron-expand ms-1 opacity-25" style={{ fontSize: '0.75rem' }} />;
+  if (!active) return <ChevronExpand size={11} />;
   return dir === 'asc'
-    ? <i className="bi bi-chevron-up ms-1" style={{ fontSize: '0.75rem' }} />
-    : <i className="bi bi-chevron-down ms-1" style={{ fontSize: '0.75rem' }} />;
+    ? <ChevronUp size={11} />
+    : <ChevronDown size={11} />;
 }
 
 export function VirtualLogTable({ entries }: VirtualLogTableProps) {
@@ -168,7 +162,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
     return (
       <button
         type="button"
-        className={`col-sort-btn ${active ? 'text-light' : 'text-muted'}`}
+        className={['ol-sort-btn', active && 'is-active'].filter(Boolean).join(' ')}
         style={{ width }}
         onClick={() => handleSort(col)}
       >
@@ -187,7 +181,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
         onExportCsv={handleExport}
       />
 
-      <div className="table-header d-flex px-3 py-1 border-bottom border-secondary small" style={{ fontSize: '0.75rem' }}>
+      <div className="ol-table-head">
         <span style={{ width: 20, flexShrink: 0 }} />
         {colHeader('ID', 'id', 55)}
         {colHeader('TIMESTAMP', 'timestamp', 155)}
@@ -195,7 +189,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
         {colHeader('IP', 'ip', 120)}
         {colHeader('METHOD', 'method', 65)}
         {colHeader('STATUS', 'status', 65)}
-        <span className="flex-grow-1 text-muted" style={{ userSelect: 'none' }}>MESSAGE / PATH</span>
+        <span className="flex-grow-1" style={{ userSelect: 'none' }}>MESSAGE / PATH</span>
       </div>
 
       <div
@@ -212,51 +206,58 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
                 key={vRow.key}
                 data-index={vRow.index}
                 ref={virtualizer.measureElement}
-                className={`log-row border-bottom border-secondary border-opacity-25 ${SEVERITY_CLASS[entry.severity]}`}
+                className="ol-row"
                 style={{
                   position: 'absolute',
                   top: vRow.start,
                   left: 0,
                   right: 0,
                   ...(isExpanded ? { minHeight: ROW_HEIGHT } : { height: ROW_HEIGHT }),
-                  fontSize: '0.75rem',
-                  fontFamily: 'monospace',
+                  // --ol-fs-xs is 0.75rem, byte-for-byte the previous value, so row
+                  // metrics and the ROW_HEIGHT virtualizer constant are unchanged.
+                  // Mono is applied per-cell below, not to the whole row: the old
+                  // row-level `monospace` keyword also bypassed the self-hosted
+                  // JetBrains Mono that .font-mono resolves to.
+                  fontSize: 'var(--ol-fs-xs)',
                 }}
               >
                 <div className="d-flex align-items-center px-3" style={{ height: ROW_HEIGHT }}>
                   <button
                     type="button"
-                    className="btn btn-link p-0 text-muted d-flex align-items-center"
-                    style={{ width: 20, flexShrink: 0, lineHeight: 1 }}
+                    className="ol-row-toggle"
+                    style={{ width: 20 }}
                     aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+                    aria-expanded={isExpanded}
                     onClick={() => toggleExpand(entry.id)}
                   >
-                    <i className={`bi bi-chevron-${isExpanded ? 'down' : 'right'}`} style={{ fontSize: '0.75rem' }} />
+                    {isExpanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
                   </button>
-                  <span className="text-muted" style={{ width: 55, flexShrink: 0 }}>{entry.id}</span>
-                  <span style={{ width: 155, flexShrink: 0 }}>{formatTs(entry.timestamp)}</span>
+                  <span style={{ width: 55, flexShrink: 0, color: 'var(--ol-text-faint)', fontVariantNumeric: 'tabular-nums' }}>{entry.id}</span>
+                  <span className="font-mono" style={{ width: 155, flexShrink: 0 }}>{formatTs(entry.timestamp)}</span>
                   <span style={{ width: 80, flexShrink: 0 }}>
-                    <span className={`badge ${SEVERITY_BADGE[entry.severity]}`} style={{ fontSize: '0.75rem' }}>
+                    <span className={`ol-chip ${SEVERITY_CHIP[entry.severity]}`}>
                       {entry.severity}
                     </span>
                   </span>
-                  <span className="text-info" style={{ width: 120, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span className="font-mono" style={{ width: 120, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {entry.ip ?? '—'}
                   </span>
-                  <span className="text-warning" style={{ width: 65, flexShrink: 0 }}>{entry.method ?? '—'}</span>
-                  <span style={{ width: 65, flexShrink: 0 }}>{entry.status ?? '—'}</span>
-                  <span className="flex-grow-1 text-truncate opacity-75">
+                  <span style={{ width: 65, flexShrink: 0 }}>{entry.method ?? '—'}</span>
+                  <span style={{ width: 65, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{entry.status ?? '—'}</span>
+                  <span className="flex-grow-1 text-truncate font-mono" style={{ color: 'var(--ol-text-dim)' }}>
                     {entry.path ?? entry.message ?? entry.raw.slice(0, 200)}
                   </span>
                 </div>
                 {isExpanded && (
                   <div
                     className="px-3 pb-2"
-                    style={{ borderTop: '1px solid rgba(48,54,61,0.4)', paddingLeft: '2.75rem' }}
+                    style={{ borderTop: '1px solid var(--ol-border-subtle)', paddingLeft: '2.75rem' }}
                   >
+                    {/* .font-mono is load-bearing here, not decorative: this is the
+                        raw log line, and the row no longer sets a mono family. */}
                     <pre
-                      className="mb-0 opacity-75"
-                      style={{ fontSize: '0.75rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'inherit' }}
+                      className="mb-0 font-mono"
+                      style={{ fontSize: 'var(--ol-fs-xs)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--ol-text-dim)' }}
                     >
                       {entry.raw}
                     </pre>

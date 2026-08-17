@@ -94,6 +94,30 @@
   font-variant-numeric: tabular-nums;
 }
 
+// Chips used as toggle buttons rather than static labels.
+// Declared BEFORE the severity modifiers below, deliberately: both sit at
+// (0,1,0), so the later declaration wins border-color, and a selected chip must
+// keep its own severity border rather than this neutral one.
+.ol-chip--interactive {
+  // A <button> would otherwise render in the UA's button font, not Inter.
+  font-family: inherit;
+  cursor: pointer;
+  // .ol-chip's background IS --ol-surface-2, which is also the filter bar's
+  // background, so without a resting border these seven toggles would be
+  // invisible until selected -- the trap .ol-btn--ghost fell into on the toolbar.
+  border-color: var(--ol-border);
+  // WCAG 2.2 SC 2.5.8: 11px text at 1.5 line-height plus .ol-chip's 0.15rem
+  // vertical padding lands around 23px, just under the 24px minimum.
+  min-height: 24px;
+
+  // Scoped to unselected chips so hovering a selected one does not strip the
+  // severity color that is the whole point of its selected state.
+  &:hover:not([aria-pressed='true']) {
+    color: var(--ol-text);
+    border-color: var(--ol-border-strong);
+  }
+}
+
 @each $name in (trace, debug, info, warn, error, fatal, unknown) {
   .ol-chip--#{$name} {
     color: var(--ol-sev-#{$name});
@@ -340,6 +364,9 @@
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
+  // The label is a bare text run that becomes an anonymous flex item, so this
+  // gap separates it from the sort chevron without wrapping it in a <span>.
+  gap: var(--ol-sp-1);
   cursor: pointer;
   user-select: none;
   background: none;
@@ -353,4 +380,21 @@
 
   &:hover { color: var(--ol-text); }
   &.is-active { color: var(--ol-text); }
+}
+
+// Bare icon button for the row expand toggle. Not .ol-btn: that carries a border
+// and background, far too heavy for a 20px chevron inside a 36px log row.
+.ol-row-toggle {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  line-height: 1;
+  color: var(--ol-text-faint);
+  cursor: pointer;
+
+  &:hover { color: var(--ol-text); }
 }
