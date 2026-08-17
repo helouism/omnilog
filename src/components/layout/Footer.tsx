@@ -8,11 +8,15 @@ const FOOTER_LINKS = [
 ];
 
 /** Landing + static page footer. Not rendered on the dashboard, which is a
- *  full-height overflow:hidden region — the navbar carries links there. */
+ *  full-height overflow:hidden region — the navbar carries links there.
+ *
+ *  Carries no horizontal padding on purpose: every mount point already supplies
+ *  its own page gutter, and adding more here would inset the text from the
+ *  hairline rule above it. */
 export function Footer() {
   return (
     <footer
-      className="d-flex flex-wrap align-items-center justify-content-between gap-3 px-4 py-4 mt-5"
+      className="d-flex flex-wrap align-items-center justify-content-between gap-3 py-4 mt-5"
       style={{ borderTop: '1px solid var(--ol-border)' }}
     >
       <span style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>

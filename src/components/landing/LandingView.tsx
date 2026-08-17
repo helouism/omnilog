@@ -47,17 +47,19 @@ function Hero({ onFile }: { onFile: (file: File) => void }) {
         <Dropzone onFile={onFile} />
       </div>
 
-      <div
-        className="d-flex flex-wrap justify-content-center gap-3 mt-3"
+      {/* The separator trails the item it follows rather than leading the next
+          one, so a wrapped row never starts a line with an orphan dot. */}
+      <ul
+        className="list-unstyled d-flex flex-wrap justify-content-center gap-3 mt-3 mb-0"
         style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}
       >
         {TRUST.map((t, i) => (
-          <span key={t}>
-            {i > 0 && <span className="me-3" aria-hidden="true">·</span>}
+          <li key={t}>
             {t}
-          </span>
+            {i < TRUST.length - 1 && <span className="ms-3" aria-hidden="true">·</span>}
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
@@ -68,7 +70,9 @@ function FeatureGrid() {
       {FEATURES.map(([label, title, body]) => (
         <div className="ol-grid-cell" key={title}>
           <div className="ol-label">{label}</div>
-          <h3 className="mb-2" style={{ fontSize: 'var(--ol-fs-md)', fontWeight: 600 }}>{title}</h3>
+          {/* h2, not h3: the grid has no section heading of its own, so an h3 here
+              would skip a level straight from the hero's h1. */}
+          <h2 className="mb-2" style={{ fontSize: 'var(--ol-fs-md)', fontWeight: 600 }}>{title}</h2>
           <p className="mb-0" style={{ fontSize: 'var(--ol-fs-sm)', lineHeight: 1.6, color: 'var(--ol-text-dim)' }}>
             {body}
           </p>
@@ -89,6 +93,7 @@ function SupportedFormats() {
               {['Format', 'Detection', 'Extracts'].map(h => (
                 <th
                   key={h}
+                  scope="col"
                   className="ol-label text-start"
                   style={{ padding: 'var(--ol-sp-3) var(--ol-sp-4)', borderBottom: '1px solid var(--ol-border)' }}
                 >
