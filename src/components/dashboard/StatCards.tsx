@@ -43,7 +43,7 @@ export function StatCards({ agg }: StatCardsProps) {
       {cards.map(card => (
         <div className="ol-grid-cell" key={card.label}>
           <div className="ol-stat-label">{card.label}</div>
-          <div className={`ol-stat-value ${card.alert ? 'ol-stat-value--alert' : ''}`}>
+          <div className={card.alert ? 'ol-stat-value ol-stat-value--alert' : 'ol-stat-value'}>
             {card.value}
           </div>
           {card.sub && <div className="ol-stat-sub">{card.sub}</div>}

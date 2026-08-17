@@ -18,12 +18,17 @@ export function DateRangeFilter({ df, dispatch, dataDateRange, filteredTotal, ov
 
   return (
     <div className="ol-toolbar">
-      <span className="ol-label mb-0">Date range</span>
+      {/* The two fields read as bare "From"/"To" on their own, so each input is
+          labelled by the group heading AND its own label: "Date range From".
+          Done with aria-labelledby rather than a <fieldset> because .ol-toolbar
+          lays its children out directly and a wrapper would break the flex row. */}
+      <span className="ol-label" id="date-range-label">Date range</span>
 
       <div className="d-flex align-items-center gap-2">
-        <label htmlFor="date-from" className="mb-0" style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>From</label>
+        <label htmlFor="date-from" id="date-from-label" className="mb-0" style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>From</label>
         <input
           id="date-from"
+          aria-labelledby="date-range-label date-from-label"
           type="datetime-local"
           className="ol-input"
           style={{ width: 190 }}
@@ -36,9 +41,10 @@ export function DateRangeFilter({ df, dispatch, dataDateRange, filteredTotal, ov
       </div>
 
       <div className="d-flex align-items-center gap-2">
-        <label htmlFor="date-to" className="mb-0" style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>To</label>
+        <label htmlFor="date-to" id="date-to-label" className="mb-0" style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>To</label>
         <input
           id="date-to"
+          aria-labelledby="date-range-label date-to-label"
           type="datetime-local"
           className="ol-input"
           style={{ width: 190 }}
@@ -58,20 +64,29 @@ export function DateRangeFilter({ df, dispatch, dataDateRange, filteredTotal, ov
         Apply
       </button>
 
+      {/* Not --ghost: this toolbar's own background is --ol-surface-2, which is
+          exactly what .ol-btn--ghost hovers to, so a ghost button would read as
+          plain text here and gain almost nothing on hover. */}
       {isFiltered && (
-        <button type="button" className="ol-btn ol-btn--sm ol-btn--ghost" onClick={() => dispatch({ type: 'clear' })}>
+        <button type="button" className="ol-btn ol-btn--sm" onClick={() => dispatch({ type: 'clear' })}>
           Clear
         </button>
       )}
 
-      <span className="ms-auto" style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>
+      <span
+        className="ms-auto"
+        aria-live="polite"
+        style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}
+      >
         {isFiltered ? (
           <>
             <span style={{ color: 'var(--ol-text)', fontWeight: 600 }}>{filteredTotal.toLocaleString()}</span>
             {' of '}{overallTotal?.toLocaleString()}{' entries'}
           </>
         ) : dataDateRange.min ? (
-          <span className="font-mono">{dataDateRange.min} — {dataDateRange.max}</span>
+          <span className="font-mono" aria-label={`Data spans ${dataDateRange.min} to ${dataDateRange.max}`}>
+            {dataDateRange.min} — {dataDateRange.max}
+          </span>
         ) : null}
       </span>
     </div>

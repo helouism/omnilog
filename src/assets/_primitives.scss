@@ -166,10 +166,15 @@
   &:hover:not(:disabled) { filter: brightness(1.1); color: var(--ol-on-accent); }
 }
 
+// Hovers to --ol-border-subtle, not --ol-surface-2: several ghost buttons sit ON
+// a surface-2 background (the dashboard toolbar), where hovering to surface-2 is
+// a no-op. border-subtle is a visible lift against both --ol-bg and --ol-surface-2.
+// A ghost button is still invisible at rest, so use it only where an adjacent
+// bordered control establishes that the area is interactive.
 .ol-btn--ghost {
   background: transparent;
   border-color: transparent;
-  &:hover:not(:disabled) { background: var(--ol-surface-2); }
+  &:hover:not(:disabled) { background: var(--ol-border-subtle); }
 }
 
 .ol-btn--sm { padding: 0.2rem 0.5rem; font-size: var(--ol-fs-2xs); }
