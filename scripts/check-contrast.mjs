@@ -102,11 +102,21 @@ const TEXT_CHECKS = [
   ['ol-sev-warn', 'ol-surface-1'],
   ['ol-sev-error', 'ol-surface-1'],
   ['ol-sev-fatal', 'ol-surface-1'],
+  ['ol-sev-unknown', 'ol-surface-1'],
   ['ol-status-2xx', 'ol-surface-1'],
   ['ol-status-3xx', 'ol-surface-1'],
   ['ol-status-4xx', 'ol-surface-1'],
   ['ol-status-5xx', 'ol-surface-1'],
   ['ol-on-accent', 'ol-accent'],
+  // --ol-surface-2 is the tightest ground in the system and had no pair here at
+  // all: it backs .ol-toolbar, .ol-table-head, FilterBar and the resting .ol-chip,
+  // all of which carry text. Only the three text tiers are listed, because those
+  // are what is actually rendered on it -- adding the severity ramp would assert
+  // a pairing the UI never draws, and a check that fails on a non-existent
+  // combination is as misleading as one that passes on an unchecked real one.
+  ['ol-text', 'ol-surface-2'],
+  ['ol-text-dim', 'ol-surface-2'],
+  ['ol-text-faint', 'ol-surface-2'],
 ];
 
 let failed = 0;

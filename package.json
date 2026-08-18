@@ -19,7 +19,6 @@
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@tanstack/react-virtual": "^3.13.26",
     "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.5.1",
     "idb": "^8.0.3",
     "react": "^19.2.6",

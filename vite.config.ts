@@ -41,10 +41,6 @@ export default defineConfig({
     },
   },
 
-  optimizeDeps: {
-    exclude: ['bootstrap-icons'],
-  },
-
   css: {
     preprocessorOptions: {
       scss: {

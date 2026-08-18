@@ -17,27 +17,32 @@ $ol-border:         #2a313c;
 $ol-border-strong:  #3a434f;
 
 // ─── Text (all three tiers clear WCAG AA at any size) ────────────────────────
-$ol-text:           #e8ecf2;  // ~15.9:1 on surface-1
-$ol-text-dim:       #98a2b0;  //   7.15:1
-$ol-text-faint:     #7d8797;  //   5.09:1
+$ol-text:           #e8ecf2;  // 15.42:1 on surface-1
+$ol-text-dim:       #98a2b0;  //  7.08:1 on surface-1
+$ol-text-faint:     #7d8797;  //  5.04:1 on surface-1, 4.70:1 on surface-2
 
 // ─── Accent (from the brand mark gradient in public/favicon.svg) ─────────────
 $ol-accent:         #58a6ff;  // 7.75:1 on bg — interactive/selected state ONLY
 $ol-accent-alt:     #a371f7;  // logo gradient + FATAL severity ONLY
-$ol-on-accent:      #05070a;  // 8.03:1 on accent — text/glyph color on accent fills
+$ol-on-accent:      #05070a;  // 7.98:1 on accent -- text/glyph color on accent fills
 
 // ─── Severity ramp (cool recedes → warm advances) ────────────────────────────
-$ol-sev-trace:      #78838f;  // 4.81:1
-$ol-sev-debug:      #8b95a3;  // 6.10:1
-$ol-sev-info:       #6e9fd4;  // 6.66:1
-$ol-sev-warn:       #d9a441;  // 8.21:1
-$ol-sev-error:      #e5534b;  // 4.99:1
-$ol-sev-fatal:      #a371f7;  // 5.51:1
-$ol-sev-unknown:    #7d8797;  // reuses text-faint
+// Ratios below are measured on --ol-surface-1, the panel ground these are drawn
+// on. They were previously all ~1% high. --ol-surface-2 is tighter by roughly
+// 0.3 (sev-trace lands at 4.42:1 there), so do not reuse these figures for a
+// pairing on that surface without recomputing -- check-contrast.mjs asserts only
+// the pairings the UI actually draws.
+$ol-sev-trace:      #78838f;  // 4.74:1
+$ol-sev-debug:      #8b95a3;  // 6.03:1
+$ol-sev-info:       #6e9fd4;  // 6.59:1
+$ol-sev-warn:       #d9a441;  // 8.13:1
+$ol-sev-error:      #e5534b;  // 4.94:1
+$ol-sev-fatal:      #a371f7;  // 5.45:1
+$ol-sev-unknown:    #7d8797;  // 5.04:1 -- reuses text-faint
 
 // ─── HTTP status ─────────────────────────────────────────────────────────────
 $ol-status-2xx:     #3fb950;  // 7.20:1
-$ol-status-3xx:     #6e9fd4;  // 6.66:1
+$ol-status-3xx:     #6e9fd4;  // 6.59:1
 $ol-status-4xx:     #d9a441;  // 8.21:1
 $ol-status-5xx:     #e5534b;  // 4.99:1
 
