@@ -57,6 +57,21 @@ export function AboutUs() {
             Your log files are never uploaded; all processing happens locally on your machine.
           </p>
 
+          <div
+            className="ol-measure mb-5"
+            style={{
+              fontSize: 'var(--ol-fs-sm)',
+              color: 'var(--ol-text-dim)',
+            }}
+          >
+            <p className="mb-1">
+              OmniLog is completely open source! We believe in transparency and community-driven development.
+            </p>
+            <p className="mb-0">
+              View the source code, report issues, or contribute on GitHub at: <a href="https://github.com/helouism/omnilog" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--ol-text)' }}>https://github.com/helouism/omnilog</a>.
+            </p>
+          </div>
+
           <section className="ol-grid ol-grid--quad">
             {FEATURES.map(([label, title, body]) => (
               <div className="ol-grid-cell" key={title}>
