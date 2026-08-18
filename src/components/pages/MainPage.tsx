@@ -5,6 +5,7 @@ import { DateRangeFilter } from '../dashboard/DateRangeFilter';
 import { LandingView } from '../landing/LandingView';
 import { VirtualLogTable } from '../table/VirtualLogTable';
 import { dateReducer, INIT_DATE } from '../../core/dateFilter';
+import { BarChartLine, Table, ExclamationTriangle, XLg } from '../icons';
 import type { AnalyticsState } from '../../hooks/useLogAnalytics';
 import type { AggregationResult, LogEntry, SeverityLevel } from '../../types/log.types';
 
@@ -110,45 +111,58 @@ export function MainPage({ state, processFile, reset }: Props) {
 
   return (
     <div className="flex-grow-1 d-flex flex-column overflow-hidden">
-      {(state.status === 'parsing' || state.status === 'sniffing') && (
-        <ProgressBar state={state} />
-      )}
-
       {isIdle ? (
         <LandingView onFile={processFile} />
       ) : (
-        <>
+        // <main> starts here rather than at the root, and the idle branch above
+        // carries its own: LandingView ends in a <footer>, and a <footer> nested
+        // inside <main> is no longer exposed as contentinfo. Exactly one <main>
+        // renders either way, since the two branches are mutually exclusive.
+        <main className="flex-grow-1 d-flex flex-column overflow-hidden">
+          {/* Inside <main>, not above it: this only ever renders while the
+              status is parsing or sniffing, neither of which is idle, so the
+              branch it would sit outside of is always the one being drawn.
+              Left where it was it belonged to no landmark at all. */}
+          {(state.status === 'parsing' || state.status === 'sniffing') && (
+            <ProgressBar state={state} />
+          )}
+
           {hasData && (
-            <div className="border-bottom border-secondary px-3">
-              <ul className="nav nav-tabs border-0">
-                <li className="nav-item">
-                  <button
-                    type="button"
-                    className={`nav-link ${tab === 'dashboard' ? 'active' : ''}`}
-                    onClick={() => setTab('dashboard')}
-                  >
-                    <i className="bi bi-bar-chart-line me-2" />Dashboard
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button
-                    type="button"
-                    className={`nav-link ${tab === 'table' ? 'active' : ''}`}
-                    onClick={() => setTab('table')}
-                  >
-                    <i className="bi bi-table me-2" />Log Table
-                    <span className="badge bg-secondary ms-2" style={{ fontSize: '0.75rem' }}>
-                      {state.aggregation?.entries.length.toLocaleString()}
-                    </span>
-                  </button>
-                </li>
-              </ul>
+            <div className="px-4" style={{ background: 'var(--ol-bg)' }}>
+              <div className="ol-tabs">
+                <button
+                  type="button"
+                  className={`ol-tab ${tab === 'dashboard' ? 'is-active' : ''}`}
+                  onClick={() => setTab('dashboard')}
+                >
+                  <BarChartLine size={14} />Dashboard
+                </button>
+                <button
+                  type="button"
+                  className={`ol-tab ${tab === 'table' ? 'is-active' : ''}`}
+                  onClick={() => setTab('table')}
+                >
+                  <Table size={14} />Log table
+                  <span className="ol-chip">{state.aggregation?.entries.length.toLocaleString()}</span>
+                </button>
+              </div>
             </div>
           )}
 
           <div className="flex-grow-1 overflow-hidden">
             {tab === 'dashboard' && hasData && filteredAgg ? (
-              <div className="h-100 overflow-auto p-3">
+              // No padding on the scroll container: .ol-toolbar below is opaque
+              // and full-bleed by design. Inset it by a gutter and the content
+              // scrolling underneath stays visible in the strip either side of
+              // it. (Vertical sticking is unaffected either way — a scroll
+              // container's sticky rect is its padding box, so `top: 0` pins to
+              // the inner edge regardless.) The gutter lives on the content.
+              <div className="h-100 overflow-auto">
+                {/* The dashboard is dense and data-forward, so its title is for
+                    assistive tech only — but it has to exist: without it the
+                    chart <h2>s have no root and pressing H lands on nothing. */}
+                <h1 className="visually-hidden">Log analysis dashboard</h1>
+
                 <DateRangeFilter
                   df={df}
                   dispatch={dispatch}
@@ -157,17 +171,19 @@ export function MainPage({ state, processFile, reset }: Props) {
                   overallTotal={state.aggregation?.totalLines}
                 />
 
-                <StatCards agg={filteredAgg} />
-                <Suspense fallback={<div className="text-muted text-center py-4 small">Loading charts…</div>}>
-                  <LazyChartsGrid agg={filteredAgg} />
-                </Suspense>
+                <div className="p-4">
+                  <StatCards agg={filteredAgg} />
+                  <Suspense fallback={<div className="text-center py-4" style={{ color: 'var(--ol-text-faint)', fontSize: 'var(--ol-fs-sm)' }}>Loading charts…</div>}>
+                    <LazyChartsGrid agg={filteredAgg} />
+                  </Suspense>
+                </div>
               </div>
             ) : tab === 'dashboard' && !hasData ? (
-              <div className="d-flex align-items-center justify-content-center h-100 text-muted">
-                <div className="text-center">
-                  <div className="spinner-border text-primary mb-3" />
-                  <div>Processing…</div>
-                </div>
+              <div
+                className="d-flex align-items-center justify-content-center h-100"
+                style={{ color: 'var(--ol-text-faint)', fontSize: 'var(--ol-fs-sm)' }}
+              >
+                Processing…
               </div>
             ) : null}
 
@@ -177,13 +193,30 @@ export function MainPage({ state, processFile, reset }: Props) {
           </div>
 
           {state.status === 'error' && (
-            <div className="alert alert-danger m-3 d-flex gap-2">
-              <i className="bi bi-exclamation-triangle-fill" />
-              <span>{state.error}</span>
-              <button type="button" className="btn-close btn-close-white ms-auto" aria-label="Dismiss error" onClick={reset} />
+            <div
+              className="ol-panel ol-panel-pad d-flex align-items-center gap-2 m-4"
+              role="alert"
+              style={{ borderColor: 'var(--ol-sev-error)' }}
+            >
+              {/* Kept as an icon, unlike the decorative ones this task deleted:
+                  it is the only thing that types the panel as a failure before
+                  the message is read. */}
+              <ExclamationTriangle size={14} className="flex-shrink-0" />
+              <span style={{ color: 'var(--ol-sev-error)', fontSize: 'var(--ol-fs-sm)' }}>{state.error}</span>
+              {/* --icon, not --sm: an icon-only flex button has no line-box
+                  strut, so it collapses to the SVG height and misses SC 2.5.8's
+                  24x24. --icon sets that floor explicitly. */}
+              <button
+                type="button"
+                className="ol-btn ol-btn--icon ms-auto"
+                aria-label="Dismiss error"
+                onClick={reset}
+              >
+                <XLg size={12} />
+              </button>
             </div>
           )}
-        </>
+        </main>
       )}
     </div>
   );

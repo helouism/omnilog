@@ -24,16 +24,15 @@ export function ProgressBar({ state }: ProgressBarProps) {
   const isSniffing = state.status === 'sniffing';
 
   return (
-    <div className="progress-container px-3 py-2 border-bottom border-secondary">
-      <div className="d-flex justify-content-between align-items-center mb-1 small">
-        <span className="text-secondary">
-          {isSniffing ? (
-            <><i className="bi bi-search me-1" />Detecting format…</>
-          ) : (
-            <><i className="bi bi-cpu me-1" />Parsing {state.fileName}</>
-          )}
+    <div
+      className="px-4 py-2"
+      style={{ background: 'var(--ol-bg)', borderBottom: '1px solid var(--ol-border)' }}
+    >
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <span style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-dim)' }}>
+          {isSniffing ? 'Detecting format…' : `Parsing ${state.fileName}`}
         </span>
-        <div className="d-flex gap-3 text-muted small">
+        <div className="d-flex gap-3" style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>
           {!isSniffing && (
             <>
               <span>{formatBytes(state.processedBytes)} / {formatBytes(state.totalBytes)}</span>
@@ -43,14 +42,21 @@ export function ProgressBar({ state }: ProgressBarProps) {
           )}
         </div>
       </div>
-      <div className="progress" style={{ height: 6 }}>
+      {/* The meaningful boundary here is filled-vs-unfilled, which is
+          --ol-accent on --ol-border-subtle at 6.24:1 — well past SC 1.4.11's
+          3:1. The track's own edge against the page is only 1.24:1, and that is
+          deliberate: the numbers above carry the value, so the track is a hint
+          at where the bar will reach, not a graphic the reading depends on. */}
+      <div style={{ height: 3, background: 'var(--ol-border-subtle)', borderRadius: 2, overflow: 'hidden' }}>
         <div
-          className={`progress-bar ${isSniffing ? 'progress-bar-striped progress-bar-animated' : ''} bg-primary`}
           style={{
+            height: '100%',
             width: '100%',
+            background: 'var(--ol-accent)',
             transformOrigin: 'left',
             transform: `scaleX(${isSniffing ? 1 : state.progress / 100})`,
             transition: 'transform 0.3s ease',
+            opacity: isSniffing ? 0.5 : 1,
           }}
         />
       </div>

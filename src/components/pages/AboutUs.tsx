@@ -1,78 +1,107 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from '../icons';
+import { Footer } from '../layout/Footer';
+
+/** Four capabilities, as hairline grid cells. The old version gave each card its
+ *  own hue (success / primary / warning / info); colour in this design system has
+ *  to mean something, and "this is the third card" is not a meaning. */
+const FEATURES: [string, string, string][] = [
+  ['Privacy', 'Zero egress', 'Your log files never leave your device. No uploads, no servers, no third-party services. The app ships with a strict Content Security Policy that blocks all outbound connections.'],
+  ['Throughput', 'Web Worker pipeline', 'Heavy parsing runs in a background Web Worker, keeping the UI at 60 FPS even for 100 GB+ files. Data is streamed in 50 MB chunks and aggregated progressively.'],
+  ['Coverage', 'Multi-format support', 'Built-in parsers for NGINX, Apache, UFW, Syslog, and a generic heuristic fallback. Format is auto-detected by confidence scoring on the first 1 MB of the file.'],
+  ['Continuity', 'Session persistence', 'Parsed results are saved to IndexedDB so your last session is instantly restored when you reopen the app — no need to re-upload the file.'],
+];
+
+const FORMATS: [string, string, string][] = [
+  ['NGINX', '0.92', 'Combined Log Format'],
+  ['Apache', '0.90', 'Common Log + ErrorLog prefix'],
+  ['UFW', '0.95', '[UFW BLOCK/ALLOW] prefix'],
+  ['Syslog', '0.88', 'RFC 3164/5424 PRI header'],
+  ['Generic', 'Fallback', 'Heuristic timestamp + severity + IP'],
+];
 
 export function AboutUs() {
   useEffect(() => {
     document.title = 'About OmniLog — Privacy-First Browser Log Analytics';
   }, []);
   const navigate = useNavigate();
+
   return (
-    <div className="flex-grow-1 overflow-auto" style={{ background: '#0d1117', color: '#e6edf3' }}>
-      <div className="container py-5" style={{ maxWidth: 760 }}>
+    <div className="flex-grow-1 overflow-auto">
+      <div style={{ maxWidth: 'var(--ol-page-max)', margin: '0 auto', padding: '4rem 1.5rem 0' }}>
+        {/* Footer sits OUTSIDE <main> on purpose: a <footer> descended from
+            <main> stops being exposed as the contentinfo landmark. */}
+        <main>
+          <button type="button" className="ol-btn mb-5" onClick={() => navigate(-1)}>
+            <ArrowLeft size={12} />Back
+          </button>
 
-        <button type="button" className="btn btn-sm btn-outline-secondary mb-4" onClick={() => navigate(-1)}>
-          <i className="bi bi-arrow-left me-2" />Back
-        </button>
-
-        <div className="d-flex align-items-center gap-3 mb-4">
-          <img src="/favicon.svg" alt="" width={40} height={38} style={{ display: 'block' }} />
-          <div>
-            <h1 className="fw-bold mb-0" style={{ fontSize: '1.75rem' }}>OmniLog</h1>
-            <span className="text-muted small">Analytics Engine</span>
-          </div>
-        </div>
-
-        <p className="lead text-secondary mb-5">
-          A high-performance, privacy-first log analytics platform that runs 100% in your browser.
-          Your log files are never uploaded; all processing happens locally on your machine.
-        </p>
-
-        <div className="row g-4 mb-5">
-          {[
-            { icon: 'bi-shield-lock-fill', color: 'text-success', title: 'Zero Egress', body: 'Your log files never leave your device. No uploads, no servers, no third-party services. The app ships with a strict Content Security Policy that blocks all outbound connections.' },
-            { icon: 'bi-cpu-fill', color: 'text-primary', title: 'Web Worker Pipeline', body: 'Heavy parsing runs in a background Web Worker, keeping the UI at 60 FPS even for 100 GB+ files. Data is streamed in 50 MB chunks and aggregated progressively.' },
-            { icon: 'bi-file-earmark-text-fill', color: 'text-warning', title: 'Multi-Format Support', body: 'Built-in parsers for NGINX, Apache, UFW, Syslog, and a generic heuristic fallback. Format is auto-detected by confidence scoring on the first 1 MB of the file.' },
-            { icon: 'bi-database-fill', color: 'text-info', title: 'Session Persistence', body: 'Parsed results are saved to IndexedDB so your last session is instantly restored when you reopen the app — no need to re-upload the file.' },
-          ].map(f => (
-            <div className="col-12 col-sm-6" key={f.title}>
-              <div className="card h-100 border-secondary" style={{ background: '#161b22' }}>
-                <div className="card-body p-4">
-                  <i className={`bi ${f.icon} ${f.color} mb-3`} style={{ fontSize: '1.5rem' }} />
-                  <h6 className="fw-semibold mb-2">{f.title}</h6>
-                  <p className="text-muted small mb-0">{f.body}</p>
-                </div>
-              </div>
+          <div className="d-flex align-items-center gap-3 mb-4">
+            <img src="/favicon.svg" alt="" width={40} height={38} style={{ display: 'block' }} />
+            <div>
+              <h1 className="mb-0" style={{ fontSize: 'var(--ol-fs-2xl)' }}>OmniLog</h1>
+              <span style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>Analytics Engine</span>
             </div>
-          ))}
-        </div>
+          </div>
 
-        <h5 className="fw-semibold mb-3 text-secondary">Supported Log Formats</h5>
-        <div className="table-responsive mb-5">
-          <table className="table table-dark table-sm table-bordered border-secondary" style={{ fontSize: '0.85rem' }}>
-            <thead>
-              <tr className="text-muted">
-                <th>Format</th>
-                <th>Confidence Threshold</th>
-                <th>Signature</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ['NGINX', '0.92', 'Combined Log Format'],
-                ['Apache', '0.90', 'Common Log + ErrorLog prefix'],
-                ['UFW', '0.95', '[UFW BLOCK/ALLOW] prefix'],
-                ['Syslog', '0.88', 'RFC 3164/5424 PRI header'],
-                ['Generic', 'Fallback', 'Heuristic timestamp + severity + IP'],
-              ].map(([fmt, thr, sig]) => (
-                <tr key={fmt}>
-                  <td className="text-light fw-semibold">{fmt}</td>
-                  <td className="text-info">{thr}</td>
-                  <td className="text-muted">{sig}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          <p
+            className="ol-measure mb-5"
+            style={{
+              fontSize: 'var(--ol-fs-md)',
+              lineHeight: 'var(--ol-lh-prose)',
+              color: 'var(--ol-text-dim)',
+            }}
+          >
+            A high-performance, privacy-first log analytics platform that runs 100% in your browser.
+            Your log files are never uploaded; all processing happens locally on your machine.
+          </p>
+
+          <section className="ol-grid ol-grid--quad">
+            {FEATURES.map(([label, title, body]) => (
+              <div className="ol-grid-cell" key={title}>
+                <div className="ol-label">{label}</div>
+                <h2 className="mb-2" style={{ fontSize: 'var(--ol-fs-md)', fontWeight: 600 }}>{title}</h2>
+                <p className="mb-0" style={{ fontSize: 'var(--ol-fs-sm)', lineHeight: 1.6, color: 'var(--ol-text-dim)' }}>
+                  {body}
+                </p>
+              </div>
+            ))}
+          </section>
+
+          <section className="mt-5">
+            <h2 className="mb-3" style={{ fontSize: 'var(--ol-fs-xl)' }}>Supported log formats</h2>
+            <div className="ol-panel" style={{ overflowX: 'auto' }}>
+              <table className="w-100 mb-0" style={{ fontSize: 'var(--ol-fs-sm)', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    {['Format', 'Confidence threshold', 'Signature'].map(h => (
+                      <th
+                        key={h}
+                        scope="col"
+                        className="ol-label text-start"
+                        style={{ padding: 'var(--ol-sp-3) var(--ol-sp-4)', borderBottom: '1px solid var(--ol-border)' }}
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {FORMATS.map(([fmt, thr, sig], i) => (
+                    <tr key={fmt} style={i > 0 ? { borderTop: '1px solid var(--ol-border-subtle)' } : undefined}>
+                      <td className="font-mono" style={{ padding: 'var(--ol-sp-3) var(--ol-sp-4)', color: 'var(--ol-text)' }}>{fmt}</td>
+                      <td className="font-mono" style={{ padding: 'var(--ol-sp-3) var(--ol-sp-4)', color: 'var(--ol-text-dim)' }}>{thr}</td>
+                      <td style={{ padding: 'var(--ol-sp-3) var(--ol-sp-4)', color: 'var(--ol-text-dim)' }}>{sig}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+        </main>
+        <Footer />
       </div>
     </div>
   );

@@ -147,10 +147,14 @@ export function LandingView({ onFile }: LandingViewProps) {
   return (
     <div className="flex-grow-1 overflow-auto">
       <div style={{ maxWidth: 'var(--ol-page-max)', margin: '0 auto', padding: '4rem 1.5rem 0' }}>
-        <Hero onFile={onFile} />
-        <FeatureGrid />
-        <SupportedFormats />
-        <HowItWorks />
+        {/* Footer sits OUTSIDE <main> on purpose: a <footer> descended from
+            <main> stops being exposed as the contentinfo landmark. */}
+        <main>
+          <Hero onFile={onFile} />
+          <FeatureGrid />
+          <SupportedFormats />
+          <HowItWorks />
+        </main>
         <Footer />
       </div>
     </div>

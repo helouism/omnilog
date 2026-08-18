@@ -222,7 +222,14 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
   return (
     <div className="ol-panel ol-panel-pad h-100">
       <div className="d-flex align-items-center justify-content-between mb-3">
-        <div className="ol-label">Request / error trend</div>
+        {/* h2, not a div: these four titles are the dashboard's only section
+            headings, under the visually-hidden h1 in MainPage. .ol-label stays
+            purely presentational and wins the cascade over the h1-h6 block at
+            (0,1,0) vs (0,0,1) — but Reboot's `margin-bottom: .5rem` on headings
+            is not something .ol-label declares, so mb-0 here (and mb-3 on the
+            other three) restores what the divs had. In this flex row the .5rem
+            would have shifted the title up off the seg control's centre line. */}
+        <h2 className="ol-label mb-0">Request / error trend</h2>
         {/* .is-active is a background swap and nothing else, so the selected
             granularity is conveyed by color alone. aria-pressed gives assistive
             tech the state, and role=group with a name explains what the three
@@ -276,7 +283,7 @@ export function TopIPsChart({ agg }: ChartsProps) {
 
   return (
     <div className="ol-panel ol-panel-pad h-100">
-      <div className="ol-label mb-3">Top 10 source IPs</div>
+      <h2 className="ol-label mb-3">Top 10 source IPs</h2>
       <div style={{ height: 200 }}>
         <Bar
           data={data}
@@ -324,7 +331,7 @@ export function StatusDistributionChart({ agg }: ChartsProps) {
 
   return (
     <div className="ol-panel ol-panel-pad h-100">
-      <div className="ol-label mb-3">HTTP status distribution</div>
+      <h2 className="ol-label mb-3">HTTP status distribution</h2>
       <div style={{ height: 220 }} className="d-flex justify-content-center">
         {/* baseOptions, not chartDefaults: shares the animation and legend
             styling so they cannot drift, while leaving out `scales`, which a
@@ -384,7 +391,7 @@ export function SeverityChart({ agg }: ChartsProps) {
 
   return (
     <div className="ol-panel ol-panel-pad h-100">
-      <div className="ol-label mb-3">Severity distribution</div>
+      <h2 className="ol-label mb-3">Severity distribution</h2>
       <div style={{ height: 200 }}>
         <Bar
           data={data}
