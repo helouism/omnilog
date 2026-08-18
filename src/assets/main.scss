@@ -65,6 +65,18 @@ a {
   &:hover { text-decoration: underline; }
 }
 
+// SC 1.4.1 (Level A): a link sitting inside running text must not be marked by
+// colour alone. --ol-accent against the surrounding --ol-text-dim is a hue
+// change at 1.02:1 relative luminance, which is invisible to a reader who does
+// not perceive the hue difference, so prose links carry a permanent underline.
+// Scoped to p/li because chrome links are identified by position and grouping
+// instead: neither Navbar nor Footer wraps its links in either element, and
+// .ol-btn is excluded so a button-styled Link is never underlined.
+:is(p, li) a:not(.ol-btn) {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 // ─── Focus: one visible ring everywhere ──────────────────────────────────────
 
 :focus-visible {

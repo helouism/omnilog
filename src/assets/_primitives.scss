@@ -244,6 +244,10 @@ $chip-tint: 22%;
 
 .ol-tabs {
   display: flex;
+  // Bootstrap .nav wrapped; this replaced it and must too. The tab strip sits
+  // inside <main>, which is overflow: hidden, so an overflowing row would be
+  // clipped outright rather than scrolled to.
+  flex-wrap: wrap;
   gap: var(--ol-sp-1);
   border-bottom: 1px solid var(--ol-border);
 }
@@ -432,4 +436,47 @@ $chip-tint: 22%;
   cursor: pointer;
 
   &:hover { color: var(--ol-text); }
+}
+
+// ─── Progress ────────────────────────────────────────────────────────────────
+
+.ol-progress {
+  height: 3px;
+  background: var(--ol-border-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ol-progress-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--ol-accent);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+// Sniffing reports no percentage -- the worker is sampling the first 1 MB to
+// detect a format, and there is no denominator yet. A static full-width bar
+// reads as "finished", which is the opposite of what is happening, so the
+// indeterminate state is a segment that travels. Bootstrap's striped animation
+// used to carry this distinction and nothing replaced it.
+.ol-progress-fill--indeterminate {
+  width: 33%;
+  transition: none;
+  animation: ol-progress-slide 1.1s ease-in-out infinite;
+}
+
+@keyframes ol-progress-slide {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(400%); }
+}
+
+// Falls back to the previous treatment rather than to a bar that looks complete:
+// dimmed and full-width still reads as "not a real measurement".
+@media (prefers-reduced-motion: reduce) {
+  .ol-progress-fill--indeterminate {
+    animation: none;
+    width: 100%;
+    opacity: 0.5;
+  }
 }

@@ -151,12 +151,18 @@ export function MainPage({ state, processFile, reset }: Props) {
 
           <div className="flex-grow-1 overflow-hidden">
             {tab === 'dashboard' && hasData && filteredAgg ? (
-              // No padding on the scroll container: .ol-toolbar below is opaque
-              // and full-bleed by design. Inset it by a gutter and the content
-              // scrolling underneath stays visible in the strip either side of
-              // it. (Vertical sticking is unaffected either way — a scroll
-              // container's sticky rect is its padding box, so `top: 0` pins to
-              // the inner edge regardless.) The gutter lives on the content.
+              // No padding on the scroll container, so .ol-toolbar reads as a
+              // full-bleed band -- the same shape as FilterBar on the table tab.
+              // Two justifications previously written here were both wrong and
+              // are worth naming so they are not re-derived: sticky is NOT
+              // broken by container padding (a scroll container's sticky rect is
+              // its padding box, so `top: 0` pins to the inner edge either way),
+              // and content does NOT show through beside an inset toolbar (the
+              // padding insets the toolbar and its scrolling siblings equally,
+              // so the side strips are empty). The reason is consistency, not a
+              // defect. The gutter moves to the content below, at --ol-sp-4
+              // rather than Bootstrap p-4: p-4 is 1.5rem, and using it put the
+              // stat labels 24px out of line with the toolbar label above them.
               <div className="h-100 overflow-auto">
                 {/* The dashboard is dense and data-forward, so its title is for
                     assistive tech only — but it has to exist: without it the
@@ -171,7 +177,7 @@ export function MainPage({ state, processFile, reset }: Props) {
                   overallTotal={state.aggregation?.totalLines}
                 />
 
-                <div className="p-4">
+                <div style={{ padding: 'var(--ol-sp-4)' }}>
                   <StatCards agg={filteredAgg} />
                   <Suspense fallback={<div className="text-center py-4" style={{ color: 'var(--ol-text-faint)', fontSize: 'var(--ol-fs-sm)' }}>Loading charts…</div>}>
                     <LazyChartsGrid agg={filteredAgg} />

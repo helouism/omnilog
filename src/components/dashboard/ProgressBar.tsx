@@ -43,21 +43,24 @@ export function ProgressBar({ state }: ProgressBarProps) {
         </div>
       </div>
       {/* The meaningful boundary here is filled-vs-unfilled, which is
-          --ol-accent on --ol-border-subtle at 6.24:1 — well past SC 1.4.11's
+          --ol-accent on --ol-border-subtle at 6.24:1 -- well past SC 1.4.11's
           3:1. The track's own edge against the page is only 1.24:1, and that is
           deliberate: the numbers above carry the value, so the track is a hint
           at where the bar will reach, not a graphic the reading depends on. */}
-      <div style={{ height: 3, background: 'var(--ol-border-subtle)', borderRadius: 2, overflow: 'hidden' }}>
+      {/* aria-valuenow is omitted while sniffing: an absent value is how a
+          progressbar declares itself indeterminate. Reporting 0 would claim no
+          work had been done. */}
+      <div
+        className="ol-progress"
+        role="progressbar"
+        aria-label={isSniffing ? 'Detecting log format' : 'Parsing progress'}
+        aria-valuemin={isSniffing ? undefined : 0}
+        aria-valuemax={isSniffing ? undefined : 100}
+        aria-valuenow={isSniffing ? undefined : Math.round(state.progress)}
+      >
         <div
-          style={{
-            height: '100%',
-            width: '100%',
-            background: 'var(--ol-accent)',
-            transformOrigin: 'left',
-            transform: `scaleX(${isSniffing ? 1 : state.progress / 100})`,
-            transition: 'transform 0.3s ease',
-            opacity: isSniffing ? 0.5 : 1,
-          }}
+          className={`ol-progress-fill${isSniffing ? ' ol-progress-fill--indeterminate' : ''}`}
+          style={isSniffing ? undefined : { transform: `scaleX(${state.progress / 100})` }}
         />
       </div>
     </div>
