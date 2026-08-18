@@ -200,6 +200,16 @@ target size), is not automatable and is checked by hand; note that an icon-only 
 has no line-box strut, so it collapses to the SVG height, `line-height` never applies, and
 it needs explicit `min-width`/`min-height`.
 
+Most controls here do **not** clear 24×24, and are not meant to. Measured against the
+live DOM, 52 targets are undersized — `.ol-row-toggle` (20×11), every `.ol-sort-btn`
+(16.5px tall), every nav and footer link (18px tall). They pass under SC 2.5.8's
+**spacing exception**: a 24px-diameter circle centred on each undersized target must not
+intersect another target's circle. So when checking by hand, measure *centre-to-centre
+distance*, not box size — a control under 24×24 is not automatically a defect, and
+enlarging it is usually the wrong fix. The tightest spacing on the page is 36px, between
+two adjacent row toggles, and that number is `ROW_HEIGHT` in `VirtualLogTable.tsx` (read
+the comment there before changing it).
+
 The checker composites alpha before comparing — a `--ol-*-fill` is `rgba($solid, 0.75)`, and
 the solid's ratio says nothing about what reaches the screen. It is also **only** aware of
 the pairings listed in `TEXT_CHECKS`; colours produced by `color-mix()` are invisible to it,

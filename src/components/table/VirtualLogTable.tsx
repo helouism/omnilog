@@ -56,6 +56,21 @@ const COL = {
   status: 76,
 } as const;
 
+/**
+ * Row pitch, and — less obviously — an accessibility constraint.
+ *
+ * `.ol-row-toggle` renders 20x11 CSS px, well under SC 2.5.8's 24x24 floor. It
+ * passes only under that criterion's *spacing* exception: a 24px-diameter circle
+ * centred on each undersized target must not intersect another target's circle.
+ * The nearest neighbour of any toggle is the toggle one row away, so the margin
+ * is exactly ROW_HEIGHT. Measured against the live DOM this is the tightest
+ * target spacing on the page — 36px against a 24px requirement.
+ *
+ * Reducing this below 24 therefore turns every row toggle into a real SC 2.5.8
+ * failure. `npm run check` cannot see it: the contrast checkers read colours, not
+ * geometry, and target size is the one floor CLAUDE.md flags as hand-checked.
+ * Either keep it >= 24 or give `.ol-row-toggle` a genuine 24x24 box first.
+ */
 const ROW_HEIGHT = 36;
 
 // `.ol-row` carries a 1px border-bottom, and box-sizing is border-box globally,
