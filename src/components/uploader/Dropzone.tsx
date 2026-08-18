@@ -46,7 +46,7 @@ export function Dropzone({ onFile }: DropzoneProps) {
         ref={inputRef}
         type="file"
         className="d-none"
-        accept="*"
+        accept="*/*"
         aria-label="Upload log file"
         onChange={onInputChange}
       />

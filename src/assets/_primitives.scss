@@ -14,6 +14,11 @@
 
 .ol-panel-pad { padding: var(--ol-sp-4); }
 
+// Error variant. A modifier rather than an inline borderColor at the call site:
+// the border is the panel's only failure cue that survives if the message text
+// is truncated, so it belongs with the panel, not with one usage of it.
+.ol-panel--error { border-color: var(--ol-sev-error); }
+
 // ─── Hairline grid: cells sharing dividers inside one container ──────────────
 // This is the core visual device. Cells never float; they share edges.
 
@@ -376,10 +381,13 @@ $chip-tint: 22%;
 
 // ─── Table ───────────────────────────────────────────────────────────────────
 
+// No position: sticky here, deliberately. This is a flex SIBLING of the scroll
+// container, not a child of it, so there is no scrollport for it to stick to --
+// the declaration that used to sit here did nothing, and z-index did nothing
+// either without a positioned element to apply to. The header stays visible
+// because the flex column gives it its own track above the flex-grow-1
+// scrollport, which is a stronger guarantee than sticky would have been.
 .ol-table-head {
-  position: sticky;
-  top: 0;
-  z-index: 5;
   display: flex;
   align-items: center;
   gap: 0;

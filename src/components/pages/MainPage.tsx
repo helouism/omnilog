@@ -129,9 +129,15 @@ export function MainPage({ state, processFile, reset }: Props) {
 
           {hasData && (
             <div className="px-4" style={{ background: 'var(--ol-bg)' }}>
+              {/* aria-pressed, not role="tablist"/role="tab". Proper ARIA tabs
+                  promise arrow-key roving focus and aria-controls wiring; a
+                  screen reader would tell the user to press arrows and nothing
+                  would happen. These are two toggle buttons and are labelled as
+                  what they are, matching the severity chips in FilterBar. */}
               <div className="ol-tabs">
                 <button
                   type="button"
+                  aria-pressed={tab === 'dashboard'}
                   className={`ol-tab ${tab === 'dashboard' ? 'is-active' : ''}`}
                   onClick={() => setTab('dashboard')}
                 >
@@ -139,6 +145,7 @@ export function MainPage({ state, processFile, reset }: Props) {
                 </button>
                 <button
                   type="button"
+                  aria-pressed={tab === 'table'}
                   className={`ol-tab ${tab === 'table' ? 'is-active' : ''}`}
                   onClick={() => setTab('table')}
                 >
@@ -200,9 +207,8 @@ export function MainPage({ state, processFile, reset }: Props) {
 
           {state.status === 'error' && (
             <div
-              className="ol-panel ol-panel-pad d-flex align-items-center gap-2 m-4"
+              className="ol-panel ol-panel--error ol-panel-pad d-flex align-items-center gap-2 m-4"
               role="alert"
-              style={{ borderColor: 'var(--ol-sev-error)' }}
             >
               {/* Kept as an icon, unlike the decorative ones this task deleted:
                   it is the only thing that types the panel as a failure before

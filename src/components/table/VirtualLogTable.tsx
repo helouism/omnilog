@@ -185,11 +185,20 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
 
   function colHeader(label: string, col: SortColumn, width: number) {
     const active = sortColumn === col;
+    // aria-sort is the idiomatic way to expose this, but it is only valid on a
+    // columnheader/rowheader role, and this is a virtualised list of divs with
+    // no table semantics -- putting it here would be inert. Until the list gains
+    // a real grid role, the state goes in the button's accessible name, which
+    // works on a plain button. The visible label stays the bare column name.
+    const sortState = active
+      ? `, sorted ${sortDir === 'asc' ? 'ascending' : 'descending'}`
+      : '';
     return (
       <button
         type="button"
         className={['ol-sort-btn', active && 'is-active'].filter(Boolean).join(' ')}
         style={{ width }}
+        aria-label={`Sort by ${label}${sortState}`}
         onClick={() => handleSort(col)}
       >
         {label}<SortIcon active={active} dir={sortDir} />
@@ -221,6 +230,9 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
       <div
         ref={parentRef}
         className="flex-grow-1 overflow-auto"
+        role="region"
+        aria-label="Log entries"
+        tabIndex={0}
         style={{ contain: 'strict' }}
       >
         <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
