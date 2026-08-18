@@ -68,7 +68,7 @@ const COL = {
  *
  * Reducing this below 24 therefore turns every row toggle into a real SC 2.5.8
  * failure. `npm run check` cannot see it: the contrast checkers read colours, not
- * geometry, and target size is the one floor CLAUDE.md flags as hand-checked.
+ * geometry, and target size is the one floor AGENTS.md flags as hand-checked.
  * Either keep it >= 24 or give `.ol-row-toggle` a genuine 24x24 box first.
  */
 const ROW_HEIGHT = 36;
