@@ -134,6 +134,49 @@ for (const name of asked) {
   }
 }
 
+// ── index.html's two unavoidable literals ────────────────────────────────────
+// The second sanctioned exception to the no-hex rule. `theme-color` is read by
+// the browser chrome, which cannot resolve a custom property, and the inline
+// body background is pre-CSS paint insurance. Both MUST equal $ol-bg: an inline
+// style outranks main.scss's `body { background: var(--ol-bg) }`, so a stale
+// value here repaints the whole app and every contrast ratio in the design
+// system is then measured against a ground that is never rendered. That is
+// exactly what had happened -- both said #0d1117 while $ol-bg was #0a0c10.
+const html = readFileSync(resolve(root, 'index.html'), 'utf-8');
+const expected = vars['ol-bg'];
+
+const htmlChecks = [
+  ['theme-color', /<meta\s+name="theme-color"\s+content="(#[0-9a-fA-F]{6})"/],
+  ['body background', /<body[^>]*background:\s*(#[0-9a-fA-F]{6})/],
+];
+
+for (const [label, re] of htmlChecks) {
+  const m = html.match(re);
+  if (!m) {
+    console.error(`FAIL  index.html ${label}: not found (did the markup change?)`);
+    failed++;
+    continue;
+  }
+  if (m[1].toLowerCase() !== expected.toLowerCase()) {
+    console.error(
+      `FAIL  index.html ${label}: '${m[1]}' != $ol-bg '${expected}'`,
+    );
+    failed++;
+    continue;
+  }
+  console.log(`PASS  index.html ${label} == $ol-bg`);
+}
+
+// And nothing ELSE in index.html may carry a colour literal.
+const strayHex = [...html.matchAll(/#[0-9a-fA-F]{6}\b/g)].map(m => m[0]);
+if (strayHex.length > htmlChecks.length) {
+  console.error(
+    `FAIL  index.html has ${strayHex.length} hex literals but only ` +
+    `${htmlChecks.length} are sanctioned: ${strayHex.join(', ')}`,
+  );
+  failed++;
+}
+
 if (failed > 0) {
   console.error(
     `\n${failed} token check(s) failed. TOKEN_FALLBACK in Charts.tsx has drifted ` +

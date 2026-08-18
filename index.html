@@ -12,7 +12,10 @@
     />
     <meta name="author" content="OmniLog" />
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#0d1117" />
+    <!-- Must equal $ol-bg in src/assets/_tokens.scss. The browser chrome reads
+         this attribute directly and cannot resolve a CSS custom property, so it
+         has to be a literal; `npm run check:tokens` asserts it matches. -->
+    <meta name="theme-color" content="#0a0c10" />
 
     <!-- Canonical -->
     <link rel="canonical" href="https://omnilog.my.id/" />
@@ -78,7 +81,12 @@
       }
     </script>
   </head>
-  <body style="margin: 0; background: #0d1117; overflow: hidden">
+  <!-- background must equal $ol-bg in src/assets/_tokens.scss; check:tokens
+       asserts it. An inline style beats the `body { background: var(--ol-bg) }`
+       rule in main.scss, so a stale value here silently repaints the entire app
+       and every contrast ratio in the design system is then measured against a
+       ground the app never renders. -->
+  <body style="margin: 0; background: #0a0c10; overflow: hidden">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

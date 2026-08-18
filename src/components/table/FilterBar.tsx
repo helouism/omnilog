@@ -32,8 +32,11 @@ export function FilterBar({ filter, onChange, totalRows, filteredRows, onExportC
   const isFiltered = filteredRows < totalRows;
 
   return (
+    // px-3, not px-4: 1rem is the gutter .ol-table-head (--ol-sp-4) and the row
+    // cells (Bootstrap px-3) both use, and .ol-toolbar on the dashboard. px-4
+    // inset this bar 8px further than the columns beneath it.
     <div
-      className="d-flex flex-wrap align-items-center gap-3 px-4 py-2"
+      className="d-flex flex-wrap align-items-center gap-3 px-3 py-2"
       style={{ background: 'var(--ol-surface-2)', borderBottom: '1px solid var(--ol-border)' }}
     >
       <div className="d-flex align-items-center gap-2">
@@ -51,7 +54,7 @@ export function FilterBar({ filter, onChange, totalRows, filteredRows, onExportC
         />
         <button
           type="button"
-          className={['ol-btn', 'ol-btn--sm', filter.isRegex && 'ol-btn--primary'].filter(Boolean).join(' ')}
+          className={['ol-btn', 'ol-btn--icon', filter.isRegex && 'ol-btn--primary'].filter(Boolean).join(' ')}
           aria-label="Toggle regex mode"
           title="Toggle regex mode"
           aria-pressed={filter.isRegex}

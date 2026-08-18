@@ -95,34 +95,59 @@
 }
 
 // Chips used as toggle buttons rather than static labels.
-// Declared BEFORE the severity modifiers below, deliberately: both sit at
-// (0,1,0), so the later declaration wins border-color, and a selected chip must
-// keep its own severity border rather than this neutral one.
+//
+// TWO separate mechanisms keep a selected chip's severity intact, and both are
+// required — neither substitutes for the other:
+//
+//   1. Declared BEFORE the severity modifiers below. Both sit at (0,1,0), so the
+//      later declaration wins `border-color`. Move this block after the @each
+//      loop and a selected chip renders the neutral --ol-border at rest.
+//   2. The hover rule is scoped `:not([aria-pressed='true'])`. A bare
+//      `.ol-chip--interactive:hover` is (0,2,0) and would beat
+//      `.ol-chip--error` (0,1,0) REGARDLESS of declaration order, stripping the
+//      severity the instant the cursor landed on a selected chip.
 .ol-chip--interactive {
-  // A <button> would otherwise render in the UA's button font, not Inter.
-  font-family: inherit;
   cursor: pointer;
-  // .ol-chip's background IS --ol-surface-2, which is also the filter bar's
-  // background, so without a resting border these seven toggles would be
-  // invisible until selected -- the trap .ol-btn--ghost fell into on the toolbar.
+  // Not for visibility — the resting --ol-text-dim label is already 6.61:1 on
+  // --ol-surface-2. This is the affordance: it marks the chip as a control, and
+  // is the surface the selected state repaints with the severity hue. Note the
+  // border itself is only 1.30:1 against surface-2, so it reads as a boundary
+  // rather than as an independently legible element.
   border-color: var(--ol-border);
-  // WCAG 2.2 SC 2.5.8: 11px text at 1.5 line-height plus .ol-chip's 0.15rem
-  // vertical padding lands around 23px, just under the 24px minimum.
+  // WCAG 2.2 SC 2.5.8. Measured without this: 11px text x 1.5 line-height
+  // (16.5px) + 0.15rem padding x 2 (4.8px) + 2px border = 23.3px under
+  // border-box, just under the 24px minimum.
   min-height: 24px;
 
-  // Scoped to unselected chips so hovering a selected one does not strip the
-  // severity color that is the whole point of its selected state.
   &:hover:not([aria-pressed='true']) {
     color: var(--ol-text);
     border-color: var(--ol-border-strong);
   }
 }
 
+// The severity hue lives on the BORDER and the background tint, never on the
+// label. Colouring 11px text with the severity token on a 12% tint of the same
+// hue was failing AA outright: trace 3.82:1, unknown 4.02:1, error 4.04:1 and
+// fatal 4.35:1 against --ol-surface-2, which is both the filter bar's background
+// and what a hovered log row composites onto. A --ol-text label on a 22% tint is
+// 9.47:1 at worst, and the severity is still read from the border (4.42-7.59:1,
+// comfortably past 1.4.11's 3:1) and the fill.
+//
+// This also gives selection three independent cues rather than one: the label
+// brightens from --ol-text-dim to --ol-text, the invisible resting border takes
+// the severity hue, and the background fills. That matters most for trace, debug
+// and unknown, whose tokens are greys barely distinguishable from --ol-text-dim
+// — colouring the label actually made selecting them look like DIMMING them.
+//
+// Enforced by the CHIP_CHECKS block in scripts/check-contrast.mjs; if you change
+// $chip-tint, run `npm run check:contrast`.
+$chip-tint: 22%;
+
 @each $name in (trace, debug, info, warn, error, fatal, unknown) {
   .ol-chip--#{$name} {
-    color: var(--ol-sev-#{$name});
+    color: var(--ol-text);
     border-color: var(--ol-sev-#{$name});
-    background: color-mix(in srgb, var(--ol-sev-#{$name}) 12%, transparent);
+    background: color-mix(in srgb, var(--ol-sev-#{$name}) #{$chip-tint}, transparent);
   }
 }
 
@@ -203,7 +228,17 @@
 
 .ol-btn--sm { padding: 0.2rem 0.5rem; font-size: var(--ol-fs-2xs); }
 
-.ol-btn--icon { padding: 0.3rem; }
+// Icon-only button. The explicit min-width/min-height are load-bearing, not
+// belt-and-braces: with no text child there is no line-box strut, so the flex
+// line collapses to the SVG's own height and `line-height` never applies. A
+// 13px icon in .ol-btn--sm measured 30.3 x 20.7 — under WCAG 2.2 SC 2.5.8's
+// 24px, and smaller than the Bootstrap button it replaced (~31 x 31), whose
+// inline `<i>` child DID create a strut.
+.ol-btn--icon {
+  padding: 0.3rem;
+  min-width: 24px;
+  min-height: 24px;
+}
 
 // ─── Tabs ────────────────────────────────────────────────────────────────────
 

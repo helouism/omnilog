@@ -35,6 +35,34 @@ const INITIAL_FILTER: FilterState = {
 type SortColumn = 'id' | 'timestamp' | 'severity' | 'ip' | 'method' | 'status';
 type SortDir = 'asc' | 'desc';
 
+/**
+ * Column widths in px. The header buttons and the row cells read the same
+ * constant so the two can never drift.
+ *
+ * A header cell is an inline-flex `.ol-sort-btn` with `flex-shrink: 0`, and its
+ * content is label + gap + sort chevron. A box narrower than that content
+ * overflows into the next column instead of shrinking, so METHOD/STATUS have to
+ * fit six uppercase glyphs *plus* the 11px chevron, not just the label.
+ * SEVERITY holds a chip rather than text, so it is sized by the chip's longest
+ * label ("UNKNOWN") plus its 0.45rem padding and 1px border on each side.
+ */
+const COL = {
+  toggle: 20,
+  id: 55,
+  timestamp: 155,
+  severity: 88,
+  ip: 120,
+  method: 76,
+  status: 76,
+} as const;
+
+const ROW_HEIGHT = 36;
+
+// `.ol-row` carries a 1px border-bottom, and box-sizing is border-box globally,
+// so its 36px declared height leaves a 35px content box. An inner wrapper at the
+// full ROW_HEIGHT overflows that box by exactly the border.
+const ROW_INNER_HEIGHT = ROW_HEIGHT - 1;
+
 function formatTs(ts: Date | null): string {
   if (!ts) return '—';
   return ts.toISOString().replace('T', ' ').slice(0, 19);
@@ -142,8 +170,6 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
     });
   }, [filteredEntries, sortColumn, sortDir]);
 
-  const ROW_HEIGHT = 36;
-
   const virtualizer = useVirtualizer({
     count: displayEntries.length,
     getScrollElement: () => parentRef.current,
@@ -182,13 +208,13 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
       />
 
       <div className="ol-table-head">
-        <span style={{ width: 20, flexShrink: 0 }} />
-        {colHeader('ID', 'id', 55)}
-        {colHeader('TIMESTAMP', 'timestamp', 155)}
-        {colHeader('SEVERITY', 'severity', 80)}
-        {colHeader('IP', 'ip', 120)}
-        {colHeader('METHOD', 'method', 65)}
-        {colHeader('STATUS', 'status', 65)}
+        <span style={{ width: COL.toggle, flexShrink: 0 }} />
+        {colHeader('ID', 'id', COL.id)}
+        {colHeader('TIMESTAMP', 'timestamp', COL.timestamp)}
+        {colHeader('SEVERITY', 'severity', COL.severity)}
+        {colHeader('IP', 'ip', COL.ip)}
+        {colHeader('METHOD', 'method', COL.method)}
+        {colHeader('STATUS', 'status', COL.status)}
         <span className="flex-grow-1" style={{ userSelect: 'none' }}>MESSAGE / PATH</span>
       </div>
 
@@ -221,37 +247,48 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
                   fontSize: 'var(--ol-fs-xs)',
                 }}
               >
-                <div className="d-flex align-items-center px-3" style={{ height: ROW_HEIGHT }}>
+                <div className="d-flex align-items-center px-3" style={{ height: ROW_INNER_HEIGHT }}>
                   <button
                     type="button"
                     className="ol-row-toggle"
-                    style={{ width: 20 }}
+                    style={{ width: COL.toggle }}
                     aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
                     aria-expanded={isExpanded}
                     onClick={() => toggleExpand(entry.id)}
                   >
                     {isExpanded ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
                   </button>
-                  <span style={{ width: 55, flexShrink: 0, color: 'var(--ol-text-faint)', fontVariantNumeric: 'tabular-nums' }}>{entry.id}</span>
-                  <span className="font-mono" style={{ width: 155, flexShrink: 0 }}>{formatTs(entry.timestamp)}</span>
-                  <span style={{ width: 80, flexShrink: 0 }}>
+                  {/* No fontVariantNumeric here or on STATUS: body already sets
+                      tabular-nums globally and it inherits. */}
+                  <span style={{ width: COL.id, flexShrink: 0, color: 'var(--ol-text-faint)' }}>{entry.id}</span>
+                  <span className="font-mono" style={{ width: COL.timestamp, flexShrink: 0 }}>{formatTs(entry.timestamp)}</span>
+                  <span style={{ width: COL.severity, flexShrink: 0 }}>
                     <span className={`ol-chip ${SEVERITY_CHIP[entry.severity]}`}>
                       {entry.severity}
                     </span>
                   </span>
-                  <span className="font-mono" style={{ width: 120, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span className="font-mono" style={{ width: COL.ip, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {entry.ip ?? '—'}
                   </span>
-                  <span style={{ width: 65, flexShrink: 0 }}>{entry.method ?? '—'}</span>
-                  <span style={{ width: 65, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{entry.status ?? '—'}</span>
+                  <span style={{ width: COL.method, flexShrink: 0 }}>{entry.method ?? '—'}</span>
+                  <span style={{ width: COL.status, flexShrink: 0 }}>{entry.status ?? '—'}</span>
                   <span className="flex-grow-1 text-truncate font-mono" style={{ color: 'var(--ol-text-dim)' }}>
                     {entry.path ?? entry.message ?? entry.raw.slice(0, 200)}
                   </span>
                 </div>
                 {isExpanded && (
                   <div
-                    className="px-3 pb-2"
-                    style={{ borderTop: '1px solid var(--ol-border-subtle)', paddingLeft: '2.75rem' }}
+                    className="pb-2"
+                    style={{
+                      borderTop: '1px solid var(--ol-border-subtle)',
+                      // px-3 dropped from the className: Bootstrap's spacing
+                      // utilities are !important, so the inline paddingLeft that
+                      // was here alongside it never applied. Both paddings are
+                      // inline now, derived from the same constants as the row
+                      // above so the raw line starts under the ID column.
+                      paddingLeft: `calc(var(--ol-sp-4) + ${COL.toggle}px)`,
+                      paddingRight: 'var(--ol-sp-4)',
+                    }}
                   >
                     {/* .font-mono is load-bearing here, not decorative: this is the
                         raw log line, and the row no longer sets a mono family. */}
