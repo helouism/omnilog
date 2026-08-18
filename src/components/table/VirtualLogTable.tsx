@@ -32,6 +32,23 @@ const INITIAL_FILTER: FilterState = {
   ipCidr: '',
 };
 
+/**
+ * Escapes every regex metacharacter so `value` matches as literal text.
+ *
+ * Plain-search mode runs the query through this: someone hunting for `GET /v1.0`
+ * or `(deprecated)` means those bytes, not "any character" and a capture group.
+ *
+ * Regex mode deliberately skips it. `filter.isRegex` is an explicit toggle in
+ * FilterBar — the button carries `aria-label="Toggle regex mode"` and flips the
+ * input's placeholder to `Regex pattern…` — so on that branch the query *is* a
+ * pattern, typed by the local user against their own file, and escaping it would
+ * defeat the feature. The caller's try/catch absorbs the SyntaxError thrown by a
+ * half-typed one.
+ */
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 type SortColumn = 'id' | 'timestamp' | 'severity' | 'ip' | 'method' | 'status';
 type SortDir = 'asc' | 'desc';
 
@@ -148,9 +165,8 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
 
     if (filter.query) {
       try {
-        const re = filter.isRegex
-          ? new RegExp(filter.query, 'i')
-          : new RegExp(filter.query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        const pattern = filter.isRegex ? filter.query : escapeRegExp(filter.query);
+        const re = new RegExp(pattern, 'i');
         result = result.filter(e => re.test(e.raw));
       } catch {
         // Invalid regex — skip
