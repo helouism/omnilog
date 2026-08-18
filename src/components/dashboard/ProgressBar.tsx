@@ -24,8 +24,12 @@ export function ProgressBar({ state }: ProgressBarProps) {
   const isSniffing = state.status === 'sniffing';
 
   return (
+    // px-3, not px-4: 16px is the gutter every other horizontal band uses --
+    // the navbar, .ol-toolbar, FilterBar, .ol-table-head and the row cells. p-4
+    // is Bootstrap's 1.5rem, so px-4 here put this band 8px out of line with the
+    // toolbar directly beneath it.
     <div
-      className="px-4 py-2"
+      className="px-3 py-2"
       style={{ background: 'var(--ol-bg)', borderBottom: '1px solid var(--ol-border)' }}
     >
       <div className="d-flex justify-content-between align-items-center mb-2">

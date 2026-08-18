@@ -8,7 +8,7 @@ High-performance, privacy-first, client-side log analytics platform. Operates 10
 
 ```bash
 npm run dev        # Start dev server (http://localhost:5173)
-npm run build      # Production build (tsc -b && vite build)
+npm run build      # tsc -b && vite build && node scripts/prerender.mjs
 npm run preview    # Preview production build
 ```
 
@@ -20,7 +20,7 @@ like a passing typecheck and is not one.
 
 ```bash
 npm run check      # contrast + design-token checkers (see Styling)
-npm run lint       # 3 pre-existing errors is the current baseline
+npm run lint       # baseline: 4 problems (3 errors, 1 warning), all pre-existing
 ```
 
 A green `npm run build` does **not** prove prerender health: `scripts/prerender.mjs` catches
@@ -113,18 +113,23 @@ src/
 │   └── idbStorage.ts           — IndexedDB CRUD
 ├── hooks/useLogAnalytics.ts    — Worker ↔ React state bridge
 ├── components/
-│   ├── layout/                 — Navbar (uses react-router-dom Link/useNavigate)
+│   ├── layout/                 — Navbar (Link/NavLink), Footer (on all 5 routes)
 │   ├── uploader/               — Dropzone
 │   ├── landing/                — LandingView: the idle-state marketing view
 │   ├── dashboard/              — Charts, StatCards, ProgressBar, DateRangeFilter
 │   ├── table/                  — VirtualLogTable, FilterBar
-│   └── pages/
-│       ├── MainPage.tsx        — Main analytics UI (extracted from App.tsx)
-│       ├── AboutUs.tsx
-│       ├── ContactUs.tsx
-│       ├── PrivacyPolicy.tsx
-│       └── TermsAndConditions.tsx
-└── assets/main.scss            — Bootstrap 5.3 dark theme
+│   ├── pages/
+│   │   ├── MainPage.tsx        — Main analytics UI (extracted from App.tsx)
+│   │   ├── AboutUs.tsx
+│   │   ├── ContactUs.tsx
+│   │   ├── PrivacyPolicy.tsx
+│   │   └── TermsAndConditions.tsx
+│   └── icons.tsx               — local SVG components (scripts/gen-icons.mjs)
+└── assets/                     — main.scss, _tokens.scss, _primitives.scss
+
+scripts/  — prerender.mjs (per-route static HTML + OG images),
+            check-contrast.mjs and check-tokens.mjs (both wired into `npm run check`),
+            gen-icons.mjs
 ```
 
 ## Routing
@@ -195,10 +200,20 @@ npm run check:tokens     # TOKEN_FALLBACK + index.html mirror _tokens.scss
 
 `check-contrast.mjs` enforces **two floors, because they are different requirements**:
 **SC 1.4.3** (4.5:1) for anything carrying text, and **SC 1.4.11** (3:1) for non-text
-graphical objects — chart fills, borders, focus rings. A third, **SC 2.5.8** (24×24 CSS px
+graphical objects. A third, **SC 2.5.8** (24×24 CSS px
 target size), is not automatable and is checked by hand; note that an icon-only flex button
 has no line-box strut, so it collapses to the SVG height, `line-height` never applies, and
 it needs explicit `min-width`/`min-height`.
+
+Read that scope narrowly: `check:contrast` derives its graphic set **exclusively** from
+the `--ol-*-fill` custom properties (`readFills` skips any token not ending `-fill`, and
+the ground is fixed to `--ol-surface-1`). **No border and no focus ring is checked by
+anything.** That is not an oversight to fix by widening the checker — the system ships
+`--ol-border` at 1.30:1 on surface-2 and 1.49:1 on bg, and `--ol-border-strong` at 2.02:1,
+deliberately: these are decorative separators, not the boundary of a control whose
+identification depends on them. Focus rings do clear 3:1 (`--ol-accent` is 7.75:1 on bg,
+6.75:1 on surface-2), just not by test. If you add a border a control *is* identified by,
+it needs 3:1 and you must check it yourself.
 
 Most controls here do **not** clear 24×24, and are not meant to. Measured against the
 live DOM, 52 targets are undersized — `.ol-row-toggle` (20×11), every `.ol-sort-btn`
@@ -219,16 +234,33 @@ it — and negative-test that it can actually fail. A check that cannot fail is 
 ### Primitives
 
 `src/assets/_primitives.scss` holds the `.ol-*` classes that replaced Bootstrap's
-components: `.ol-panel` (+ `--error`), `.ol-btn` (+ `--sm`, `--icon`, `--ghost`,
-`--primary`), `.ol-chip` (+ severity and `--interactive` modifiers), `.ol-grid` /
-`.ol-grid-cell`, `.ol-tabs` / `.ol-tab`, `.ol-toolbar`, `.ol-seg`, `.ol-input`,
-`.ol-table-head`, `.ol-row`, `.ol-sort-btn`, `.ol-row-toggle`, `.ol-progress`. The
-utilities `.ol-label`, `.ol-measure` and `.font-mono` live in `main.scss`.
+components. The full set, so that "not in this list" is a reliable signal:
+
+- **Panel** — `.ol-panel` (+ `--error`), `.ol-panel-pad`
+- **Button** — `.ol-btn` (+ `--sm`, `--icon`, `--ghost`, `--primary`)
+- **Chip** — `.ol-chip` (+ per-severity and `--accent`, `--interactive`)
+- **Grid** — `.ol-grid` (+ `--quad`), `.ol-grid-cell`
+- **Stat** — `.ol-stat-label`, `.ol-stat-value` (+ `--alert`), `.ol-stat-sub`
+- **Nav** — `.ol-navlink` (+ `--dim`)
+- **Tabs** — `.ol-tabs`, `.ol-tab`
+- **Toolbar** — `.ol-toolbar`, `.ol-seg`, `.ol-seg-item`
+- **Input** — `.ol-input`
+- **Dropzone** — `.ol-dropzone`, `.ol-dropzone-icon`
+- **Table** — `.ol-table-head`, `.ol-row`, `.ol-sort-btn`, `.ol-row-toggle`
+- **Progress** — `.ol-progress`, `.ol-progress-fill` (+ `--indeterminate`)
+
+The utilities `.ol-label`, `.ol-measure` and `.font-mono` live in `main.scss`.
 
 Base surfaces: `--ol-bg` `#0a0c10` (body), `--ol-surface-1` `#12151b` (panels),
 `--ol-surface-2` `#181c24` (toolbars, table head, resting chips).
 
-Bootstrap is retained only for Reboot, the grid, and layout/spacing utilities. Two traps:
+Bootstrap is used here only for Reboot, the grid, and layout/spacing utilities — but note
+`main.scss` still does `@import 'bootstrap/scss/bootstrap'`, i.e. the **whole** distribution.
+Removing the component *usages* did not remove their CSS: roughly **35% of the shipped
+243 kB stylesheet (~85 kB)** is rules for components this app does not contain — modals,
+carousels, offcanvas panels, accordions, dropdowns, popovers, tooltips, list groups and the
+form controls. Narrowing that import is the single biggest CSS win available and is not
+blocked by anything. Two traps:
 its spacing utilities are **`!important`**, so an inline `padding` alongside a `p-*` class
 silently does nothing; and `p-4` is 1.5rem while `--ol-sp-4` is 1rem — prefer the token when
 aligning against anything else built from tokens.

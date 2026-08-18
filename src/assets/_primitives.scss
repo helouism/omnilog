@@ -381,12 +381,16 @@ $chip-tint: 22%;
 
 // ─── Table ───────────────────────────────────────────────────────────────────
 
-// No position: sticky here, deliberately. This is a flex SIBLING of the scroll
-// container, not a child of it, so there is no scrollport for it to stick to --
-// the declaration that used to sit here did nothing, and z-index did nothing
-// either without a positioned element to apply to. The header stays visible
-// because the flex column gives it its own track above the flex-grow-1
-// scrollport, which is a stronger guarantee than sticky would have been.
+// No position: sticky here, deliberately. This is a flex SIBLING of the element
+// that scrolls, not a child of it. Be precise about why that killed the sticky
+// that used to sit here: it is NOT that no scrollport exists -- the `overflow:
+// hidden` ancestor in MainPage does establish a scroll container, so a sticky
+// descendant does have one. It is that this particular scrollport never
+// scrolls, so the offset that would push the header is always zero. z-index was
+// inert for the separate reason that a static element has no stacking to order.
+// The header stays put because the flex column gives it its own track above the
+// flex-grow-1 scrollport -- a stronger guarantee than sticky, and verified in a
+// browser at row 333 of 40,000.
 .ol-table-head {
   display: flex;
   align-items: center;

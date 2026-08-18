@@ -128,7 +128,11 @@ export function MainPage({ state, processFile, reset }: Props) {
           )}
 
           {hasData && (
-            <div className="px-4" style={{ background: 'var(--ol-bg)' }}>
+            // px-3, not px-4: this strip sits directly above .ol-toolbar on the
+            // dashboard tab and FilterBar on the table tab, both of which gutter
+            // at 16px. Bootstrap step 4 is 1.5rem while --ol-sp-4 is 1rem, so
+            // px-4 here pushed the tab labels 8px off every band below them.
+            <div className="px-3" style={{ background: 'var(--ol-bg)' }}>
               {/* aria-pressed, not role="tablist"/role="tab". Proper ARIA tabs
                   promise arrow-key roving focus and aria-controls wiring; a
                   screen reader would tell the user to press arrows and nothing
@@ -206,8 +210,10 @@ export function MainPage({ state, processFile, reset }: Props) {
           </div>
 
           {state.status === 'error' && (
+            // m-3 (1rem), not m-4: Bootstrap step 4 is 1.5rem, which set this
+            // panel's left edge 8px inside every other band in the column.
             <div
-              className="ol-panel ol-panel--error ol-panel-pad d-flex align-items-center gap-2 m-4"
+              className="ol-panel ol-panel--error ol-panel-pad d-flex align-items-center gap-2 m-3"
               role="alert"
             >
               {/* Kept as an icon, unlike the decorative ones this task deleted:

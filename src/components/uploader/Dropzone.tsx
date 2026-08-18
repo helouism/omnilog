@@ -73,10 +73,13 @@ export function Dropzone({ onFile }: DropzoneProps) {
       </button>
 
       {error && (
+        // The border comes from --error, not an inline borderColor: it belongs
+        // with the panel, not with one usage of it. Colour and size stay inline
+        // because the modifier deliberately carries border-color only.
         <div
-          className="ol-panel ol-panel-pad d-flex align-items-center gap-2 mt-3"
+          className="ol-panel ol-panel--error ol-panel-pad d-flex align-items-center gap-2 mt-3"
           role="alert"
-          style={{ borderColor: 'var(--ol-sev-error)', color: 'var(--ol-sev-error)', fontSize: 'var(--ol-fs-sm)' }}
+          style={{ color: 'var(--ol-sev-error)', fontSize: 'var(--ol-fs-sm)' }}
         >
           <ExclamationTriangle size={14} />
           {error}
