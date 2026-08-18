@@ -66,7 +66,10 @@ $ol-status-5xx:     #e5534b;  // 4.99:1
 //     request/error trend line chart. Both of its datasets fill to the origin,
 //     and chart.js paints dataset 0 last (it iterates metasets in reverse), so
 //     the requests area is drawn over the errors line. At fill weight that
-//     buries the errors series at 1.63:1; at wash weight it stays at 4.38:1.
+//     buries the errors series at 1.30:1; at wash weight it stays at 4.32:1.
+//     (Both are the solid error line seen through the requests area composited
+//     over --ol-surface-1. Reading the fill-weight stack any other way gives
+//     1.22-1.41:1, so the conclusion does not turn on which reading you pick.)
 //     The signal in that chart is the 1.5px line in the solid token; the area
 //     is only there to hint at volume.
 :root {

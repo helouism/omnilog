@@ -190,7 +190,10 @@ export function TimeSeriesChart({ agg }: ChartsProps) {
   // chart.js paints dataset 0 LAST (_drawDatasets iterates metasets in reverse)
   // — the requests area lands on top of the errors line. Hence *-wash (8%) here
   // and not *-fill (75%): at fill weight the errors series, which is the whole
-  // point of the second dataset, drops to 1.63:1 against the blue above it.
+  // point of the second dataset, drops to 1.30:1 against the blue above it,
+  // versus 4.32:1 at wash weight. Both measure the solid $ol-sev-error line seen
+  // through the requests area composited over --ol-surface-1; every other way of
+  // reading the fill-weight stack (1.22–1.41:1) is just as far below 3:1.
   // The solid borderColor is what carries each series; the area only hints at
   // volume. See the two-weight note in _tokens.scss.
   const data = {
