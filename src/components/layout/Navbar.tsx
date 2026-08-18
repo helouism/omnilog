@@ -29,7 +29,7 @@ export function Navbar({ state, onReset }: NavbarProps) {
 
   return (
     <nav
-      className="d-flex flex-wrap align-items-center justify-content-between px-3 py-2"
+      className="d-flex flex-wrap align-items-center justify-content-between px-3 py-2 flex-shrink-0"
       style={{
         minHeight: 52,
         columnGap: 'var(--ol-sp-4)',

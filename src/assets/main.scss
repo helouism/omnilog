@@ -27,6 +27,7 @@ $font-family-base:       $font-family-sans-serif;
 
 html, body, #root {
   height: 100%;
+  height: 100dvh;
   overflow: hidden;
 }
 

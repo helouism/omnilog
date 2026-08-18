@@ -31,7 +31,7 @@ export function DateRangeFilter({ df, dispatch, dataDateRange, filteredTotal, ov
           aria-labelledby="date-range-label date-from-label"
           type="datetime-local"
           className="ol-input"
-          style={{ width: 190 }}
+          style={{ width: '100%', maxWidth: 190 }}
           value={df.dateFrom}
           min={dataDateRange.min}
           max={df.dateTo || dataDateRange.max}
@@ -47,7 +47,7 @@ export function DateRangeFilter({ df, dispatch, dataDateRange, filteredTotal, ov
           aria-labelledby="date-range-label date-to-label"
           type="datetime-local"
           className="ol-input"
-          style={{ width: 190 }}
+          style={{ width: '100%', maxWidth: 190 }}
           value={df.dateTo}
           min={df.dateFrom || dataDateRange.min}
           max={dataDateRange.max}

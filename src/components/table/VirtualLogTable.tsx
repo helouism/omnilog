@@ -198,7 +198,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
 
   const items = virtualizer.getVirtualItems();
 
-  function colHeader(label: string, col: SortColumn, width: number) {
+  function colHeader(label: string, col: SortColumn, width: number, hideOnMobile?: boolean) {
     const active = sortColumn === col;
     // aria-sort is the idiomatic way to expose this, but it is only valid on a
     // columnheader/rowheader role, and this is a virtualised list of divs with
@@ -211,7 +211,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
     return (
       <button
         type="button"
-        className={['ol-sort-btn', active && 'is-active'].filter(Boolean).join(' ')}
+        className={['ol-sort-btn', active && 'is-active', hideOnMobile && 'd-none d-sm-inline-flex'].filter(Boolean).join(' ')}
         style={{ width }}
         aria-label={`Sort by ${label}${sortState}`}
         onClick={() => handleSort(col)}
@@ -233,11 +233,11 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
 
       <div className="ol-table-head">
         <span style={{ width: COL.toggle, flexShrink: 0 }} />
-        {colHeader('ID', 'id', COL.id)}
+        {colHeader('ID', 'id', COL.id, true)}
         {colHeader('TIMESTAMP', 'timestamp', COL.timestamp)}
         {colHeader('SEVERITY', 'severity', COL.severity)}
         {colHeader('IP', 'ip', COL.ip)}
-        {colHeader('METHOD', 'method', COL.method)}
+        {colHeader('METHOD', 'method', COL.method, true)}
         {colHeader('STATUS', 'status', COL.status)}
         <span className="flex-grow-1" style={{ userSelect: 'none' }}>MESSAGE / PATH</span>
       </div>
@@ -287,7 +287,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
                   </button>
                   {/* No fontVariantNumeric here or on STATUS: body already sets
                       tabular-nums globally and it inherits. */}
-                  <span style={{ width: COL.id, flexShrink: 0, color: 'var(--ol-text-faint)' }}>{entry.id}</span>
+                  <span className="d-none d-sm-block" style={{ width: COL.id, flexShrink: 0, color: 'var(--ol-text-faint)' }}>{entry.id}</span>
                   <span className="font-mono" style={{ width: COL.timestamp, flexShrink: 0 }}>{formatTs(entry.timestamp)}</span>
                   <span style={{ width: COL.severity, flexShrink: 0 }}>
                     <span className={`ol-chip ${SEVERITY_CHIP[entry.severity]}`}>
@@ -297,7 +297,7 @@ export function VirtualLogTable({ entries }: VirtualLogTableProps) {
                   <span className="font-mono" style={{ width: COL.ip, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {entry.ip ?? '—'}
                   </span>
-                  <span style={{ width: COL.method, flexShrink: 0 }}>{entry.method ?? '—'}</span>
+                  <span className="d-none d-sm-block" style={{ width: COL.method, flexShrink: 0 }}>{entry.method ?? '—'}</span>
                   <span style={{ width: COL.status, flexShrink: 0 }}>{entry.status ?? '—'}</span>
                   <span className="flex-grow-1 text-truncate font-mono" style={{ color: 'var(--ol-text-dim)' }}>
                     {entry.path ?? entry.message ?? entry.raw.slice(0, 200)}
