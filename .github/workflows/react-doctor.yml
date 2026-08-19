@@ -43,7 +43,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: millionco/react-doctor@v1
+      # Pinned by SHA, not the mutable @v2 tag: this job holds
+      # pull-requests: write and issues: write, and a floating major tag
+      # silently re-points on every upstream release.
+      - uses: millionco/react-doctor@01820bb4fd4d0a4aebcd8df2b2a143a098649cb2 # v2.2.8
         # Common configuration knobs — uncomment any to override the default.
         # Full reference: https://www.react.doctor/ci
         # with:

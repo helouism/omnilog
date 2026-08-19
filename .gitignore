@@ -32,3 +32,6 @@ dist-ssr
 !.dev.vars.example
 .env*
 !.env.example
+
+# Agent skill installs (local tooling, like .claude/)
+.agents/
