@@ -41,7 +41,7 @@ jobs:
   react-doctor:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # Pinned by SHA, not the mutable @v2 tag: this job holds
       # pull-requests: write and issues: write, and a floating major tag
