@@ -1,0 +1,64 @@
+# Dependabot version updates.
+# Reference: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Two ecosystems live in this repo: the npm manifest at the root, and the
+# GitHub Actions pinned in .github/workflows/.
+#
+# Grouping strategy: minor and patch updates are batched into one PR per
+# concern, but MAJOR updates are deliberately left out of every group so each
+# one arrives as its own reviewable PR. That matters here because several
+# majors would need a hand-check against constraints in AGENTS.md that no
+# automated test covers — a bootstrap major against the ~85 kB of unused CSS
+# already shipping, a vite major against the manualChunks rules that keep
+# chart.js out of the initial bundle, and a react-router major against the
+# five prerendered routes.
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      # No timezone set, so this is UTC. Add `timezone: "Area/Location"`
+      # (IANA name) if you would rather it land in local morning.
+      time: "06:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      # Yields "chore(deps): ..." and "chore(deps-dev): ...", matching the
+      # conventional-commit style already used in this repo's history.
+      prefix: "chore"
+      include: "scope"
+    groups:
+      # Ships to the browser. Kept separate from tooling because a runtime
+      # bump can move bundle size, and this repo has hard budgets for that.
+      production-minor-patch:
+        dependency-type: "production"
+        update-types: ["minor", "patch"]
+      # Build and lint tooling. Nothing here reaches the deployed artifact,
+      # so these are the safest to take in a single batch.
+      dev-minor-patch:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+      # Batches Dependabot's *security* PRs into one branch instead of one
+      # per advisory. Without this, a day like the 14-alert backlog opens
+      # more PRs than the 5-PR limit above even allows.
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: "github-actions"
+    # "/" is correct even though the workflows sit in .github/workflows —
+    # this ecosystem's directory is the repo root, not the workflow folder.
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    groups:
+      actions-minor-patch:
+        update-types: ["minor", "patch"]
