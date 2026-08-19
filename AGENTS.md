@@ -30,6 +30,23 @@ A green `npm run build` does **not** prove prerender health: `scripts/prerender.
 per-route errors and continues, so the build stays green while a route fails. Read the
 per-route `✓`/`✗` markers it prints.
 
+### react-doctor baseline
+
+`npm run doctor` has a standing baseline of **8 warnings, none of them defects**. CI runs at
+`fail-on: error`, so warnings never block a PR. Read this before "fixing" any of them:
+
+| Finding | Verdict |
+|---|---|
+| `prefer-dynamic-import` ×2 — `Charts.tsx:2,15` | **False positive.** The rule sees the static chart.js import inside `Charts.tsx`, not that `MainPage.tsx` only reaches it via `lazy(() => import('../dashboard/Charts'))`. Confirm the boundary with `grep modulepreload dist/index.html` — never by moving the import. |
+| `deslop/unused-file` — `src/entry-server.tsx` | **False positive.** It is the SSR entry named in `vite.ssr.config.ts` and loaded by `prerender.mjs`. Nothing in the app imports it, by design. |
+| `deslop/unused-export` ×4 — `idbStorage.ts:51,64,78,83` | **Real, deliberate.** `listSessions`/`getSession`/`deleteSession`/`clearAllSessions` are the read-and-delete half of the documented IndexedDB CRUD; only `saveSession` is wired up today. Removing them is a product decision, not a cleanup. |
+| `deslop/unused-export` — `generic.parser.ts:81` | **Real, required.** `scoreGeneric` is this file's half of the parser contract's `score<Format>()` export. It returns 0 and is deliberately not registered in `detectFormat()`, because generic is the fallback. It is also what produces the `_sample` error in the lint baseline above. |
+
+react-doctor's config is **rule-level only** (`rules disable|set`); there is no per-file
+ignore. Silencing the two false positives therefore means disabling those rules repo-wide,
+which would also blind you to a genuine eager chart.js import later — the exact regression
+the Initial Bundle section exists to prevent. Leave them enabled and noisy.
+
 ## Architecture
 
 ### Two-Layer Design
