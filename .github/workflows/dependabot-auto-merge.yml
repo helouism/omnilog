@@ -1,0 +1,76 @@
+# Auto-merges the Dependabot PRs that are safe to take unattended.
+#
+# dependabot.yml has no auto-merge option, so this workflow is the mechanism.
+# It stays INERT until both prerequisites below are met, and reports that as a
+# notice rather than failing the check:
+#
+#   1. Settings > General > "Allow auto-merge" is enabled.
+#   2. main has a branch protection rule that makes "react-doctor" a REQUIRED
+#      status check.
+#
+# (2) is not optional decoration. `gh pr merge --auto` only queues a merge
+# behind checks that are *required*; with no protection rule there is nothing
+# to wait on and the PR merges immediately, unreviewed. That is strictly worse
+# than merging by hand, so the guard below refuses to proceed when it can
+# positively confirm no required checks exist.
+
+name: Dependabot auto-merge
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Verify auto-merge prerequisites
+        id: prereq
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          REPO: "${{ github.repository }}"
+        run: |
+          ready=true
+
+          if [ "$(gh api "repos/$REPO" --jq '.allow_auto_merge')" != "true" ]; then
+            ready=false
+            echo "::notice title=Dependabot auto-merge::Inactive - repository setting \"Allow auto-merge\" is off. Enable it in Settings > General."
+          fi
+
+          # Best effort: reading protection needs admin scope, which
+          # GITHUB_TOKEN may not carry. Only block when we can positively
+          # confirm that no required checks are configured.
+          checks=$(gh api "repos/$REPO/branches/main/protection/required_status_checks" --jq '.contexts | length' 2>/dev/null || echo "unknown")
+          if [ "$checks" = "0" ]; then
+            ready=false
+            echo "::notice title=Dependabot auto-merge::Inactive - main has no required status checks, so --auto would merge immediately without waiting for react-doctor."
+          elif [ "$checks" = "unknown" ]; then
+            echo "::warning title=Dependabot auto-merge::Could not read branch protection for main. Confirm react-doctor is a required check, or auto-merge will not wait for it."
+          fi
+
+          echo "ready=$ready" >> "$GITHUB_OUTPUT"
+
+      # Patch bumps anywhere, plus minor bumps confined to devDependencies.
+      # Every major, and every minor that reaches the shipped bundle, is left
+      # for a human. On a grouped PR update-type reports the LARGEST bump in
+      # the group, so a single major blocks the whole group.
+      - name: Fetch Dependabot metadata
+        id: meta
+        if: steps.prereq.outputs.ready == 'true'
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Enable auto-merge
+        if: >-
+          steps.prereq.outputs.ready == 'true' &&
+          (steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+           (steps.meta.outputs.update-type == 'version-update:semver-minor' &&
+            steps.meta.outputs.dependency-type == 'direct:development'))
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: "${{ github.event.pull_request.html_url }}"
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
