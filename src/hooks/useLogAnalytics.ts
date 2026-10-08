@@ -1,11 +1,11 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import type {
   AggregationResult,
   WorkerStatus,
   LogFormat,
   WorkerEvent,
 } from '../types/log.types';
-import { saveSession } from '../core/idbStorage';
+import { listSessions, saveSession } from '../core/idbStorage';
 
 export interface AnalyticsState {
   status: WorkerStatus;
@@ -40,8 +40,34 @@ const INITIAL_STATE: AnalyticsState = {
 export function useLogAnalytics() {
   const [state, setState] = useState<AnalyticsState>(INITIAL_STATE);
   const workerRef = useRef<Worker | null>(null);
+  const hasStartedRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listSessions().then(sessions => {
+      const latest = sessions[0];
+      if (cancelled || hasStartedRef.current || !latest) return;
+      setState({
+        ...INITIAL_STATE,
+        status: 'done',
+        progress: 100,
+        processedBytes: latest.fileSize,
+        totalBytes: latest.fileSize,
+        linesProcessed: latest.aggregation.totalLines,
+        format: latest.aggregation.format,
+        confidence: latest.aggregation.confidence,
+        aggregation: latest.aggregation,
+        fileName: latest.fileName,
+        fileSize: latest.fileSize,
+      });
+    }).catch(() => {
+      // IndexedDB is optional; a blocked or unavailable store must not prevent use.
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const processFile = useCallback((file: File) => {
+    hasStartedRef.current = true;
     // Terminate any running worker
     if (workerRef.current) {
       workerRef.current.terminate();
@@ -125,6 +151,7 @@ export function useLogAnalytics() {
   }, []);
 
   const reset = useCallback(() => {
+    hasStartedRef.current = true;
     if (workerRef.current) {
       workerRef.current.terminate();
       workerRef.current = null;

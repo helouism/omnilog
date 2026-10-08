@@ -6,14 +6,14 @@ Privacy-first log analytics that runs **100% in your browser**. Parse and visual
 
 ## Features
 
-- **Zero-egress** — log data never leaves your machine. CSP enforces strict `script-src` and `connect-src` in production; the only permitted outbound connection is Cloudflare Web Analytics.
+- **Local processing** — log contents are processed in your browser and are not uploaded. The site may send aggregate Cloudflare Web Analytics traffic metrics.
 - **Multi-format detection** — auto-detects NGINX, Apache, UFW, Syslog, and generic log formats using confidence scoring.
-- **Streaming Web Worker** — files are read in 50 MB chunks on a background thread, keeping the UI at 60 FPS regardless of file size.
+- **Streaming Web Worker** — files are read in 50 MB chunks. Practical limits depend on browser memory because parsed rows are retained for search and export.
 - **Live dashboard** — request/error trend, HTTP status distribution, top 10 source IPs, severity breakdown, and stat cards — all update progressively as the file is parsed.
 - **Global date filter** — filter the entire dashboard (all charts + stat cards) by a custom time range, applied on demand.
 - **Virtual log table** — renders millions of rows without DOM overhead via `@tanstack/react-virtual`. Supports full-text search, regex, severity filter, and sortable columns.
 - **CSV export** — export filtered & sorted log entries to CSV in one click.
-- **IndexedDB session persistence** — last parsed file is restored on page reload.
+- **IndexedDB session persistence** — the most recent completed analysis can be restored on page reload; up to three sessions are retained locally.
 
 ## Supported Formats
 

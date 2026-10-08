@@ -2,6 +2,7 @@ import type { AnalyticsState } from '../../hooks/useLogAnalytics';
 
 interface ProgressBarProps {
   state: AnalyticsState;
+  onCancel: () => void;
 }
 
 function formatBytes(bytes: number): string {
@@ -18,7 +19,7 @@ function formatEta(seconds: number): string {
   return `~${m}m ${s}s remaining`;
 }
 
-export function ProgressBar({ state }: ProgressBarProps) {
+export function ProgressBar({ state, onCancel }: ProgressBarProps) {
   if (state.status !== 'parsing' && state.status !== 'sniffing') return null;
 
   const isSniffing = state.status === 'sniffing';
@@ -44,6 +45,9 @@ export function ProgressBar({ state }: ProgressBarProps) {
               {state.eta > 0 && <span>{formatEta(state.eta)}</span>}
             </>
           )}
+          <button type="button" className="ol-btn ol-btn--sm" onClick={onCancel}>
+            Cancel
+          </button>
         </div>
       </div>
       {/* The meaningful boundary here is filled-vs-unfilled, which is

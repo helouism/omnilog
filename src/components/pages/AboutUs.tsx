@@ -7,10 +7,10 @@ import { Footer } from '../layout/Footer';
  *  own hue (success / primary / warning / info); colour in this design system has
  *  to mean something, and "this is the third card" is not a meaning. */
 const FEATURES: [string, string, string][] = [
-  ['Privacy', 'Zero egress', 'Your log files never leave your device. No uploads, no servers, no third-party services. The app ships with a strict Content Security Policy that blocks all outbound connections.'],
-  ['Throughput', 'Web Worker pipeline', 'Heavy parsing runs in a background Web Worker, keeping the UI at 60 FPS even for 100 GB+ files. Data is streamed in 50 MB chunks and aggregated progressively.'],
+  ['Privacy', 'Local processing', 'Your log contents are processed locally and are not uploaded. The site uses aggregate page analytics, which cannot read the contents of your selected file.'],
+  ['Throughput', 'Web Worker pipeline', 'Heavy parsing runs in a background Web Worker and reads data in 50 MB chunks. Practical limits depend on browser memory because detailed rows are retained for search and export.'],
   ['Coverage', 'Multi-format support', 'Built-in parsers for NGINX, Apache, UFW, Syslog, and a generic heuristic fallback. Format is auto-detected by confidence scoring on the first 1 MB of the file.'],
-  ['Continuity', 'Session persistence', 'Parsed results are saved to IndexedDB so your last session is instantly restored when you reopen the app — no need to re-upload the file.'],
+  ['Continuity', 'Session persistence', 'Parsed results are saved locally to IndexedDB and the most recent session can be restored when you reopen the app.'],
 ];
 
 const FORMATS: [string, string, string][] = [

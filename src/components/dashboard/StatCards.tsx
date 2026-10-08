@@ -1,4 +1,5 @@
 import type { AggregationResult } from '../../types/log.types';
+import { isErrorEntry } from '../../core/entryMetrics';
 
 interface StatCardsProps {
   agg: AggregationResult;
@@ -12,9 +13,7 @@ function pct(a: number, b: number): string {
 /** Four-cell hairline strip. Deliberately monochrome — the only cell that ever
  *  takes color is Errors, and only when the count is non-zero. */
 export function StatCards({ agg }: StatCardsProps) {
-  const errorCount = agg.severityDistribution
-    .filter(s => s.severity === 'ERROR' || s.severity === 'FATAL')
-    .reduce((acc, s) => acc + s.count, 0);
+  const errorCount = agg.entries.filter(isErrorEntry).length;
 
   const cards: { label: string; value: string; sub?: string; alert?: boolean }[] = [
     {

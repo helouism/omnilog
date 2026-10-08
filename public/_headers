@@ -7,4 +7,4 @@
 
   # Content Security Policy
   # Allows: same-origin app, Web Worker blobs, Cloudflare Web Analytics
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; frame-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; font-src 'self' data:;
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; font-src 'self' data:;

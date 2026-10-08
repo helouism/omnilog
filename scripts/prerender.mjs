@@ -210,7 +210,8 @@ async function main() {
       console.log(`[prerender]   ✓ ${route.path}`);
     } catch (err) {
       console.error(`[prerender]   ✗ ${route.path}: ${err.message}`);
-      // Non-fatal — SPA fallback still works for this route
+      // A successful build must not publish a partially prerendered site.
+      process.exitCode = 1;
     }
   }
 
