@@ -50,8 +50,11 @@ export async function saveSession(
   // Keep persistence bounded. A browser tool should not retain every analysis
   // forever, especially when a result contains raw log lines.
   const sessions: SessionRecord[] = await db.getAllFromIndex(STORE_SESSIONS, 'createdAt');
-  for (const stale of sessions.slice(0, Math.max(0, sessions.length - MAX_SESSIONS))) {
-    await db.delete(STORE_SESSIONS, stale.id);
+  const stale = sessions.slice(0, Math.max(0, sessions.length - MAX_SESSIONS));
+  if (stale.length > 0) {
+    const tx = db.transaction(STORE_SESSIONS, 'readwrite');
+    await Promise.all(stale.map(session => tx.store.delete(session.id)));
+    await tx.done;
   }
   return id;
 }
