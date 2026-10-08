@@ -4,6 +4,7 @@ import type { IDBSession, AggregationResult, LogFormat } from '../types/log.type
 const DB_NAME = 'omnilog';
 const DB_VERSION = 1;
 const STORE_SESSIONS = 'sessions';
+const MAX_SESSIONS = 3;
 
 interface SessionRecord {
   id: string;
@@ -45,6 +46,13 @@ export async function saveSession(
     aggregation,
   };
   await db.put(STORE_SESSIONS, record);
+
+  // Keep persistence bounded. A browser tool should not retain every analysis
+  // forever, especially when a result contains raw log lines.
+  const sessions: SessionRecord[] = await db.getAllFromIndex(STORE_SESSIONS, 'createdAt');
+  for (const stale of sessions.slice(0, Math.max(0, sessions.length - MAX_SESSIONS))) {
+    await db.delete(STORE_SESSIONS, stale.id);
+  }
   return id;
 }
 

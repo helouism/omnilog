@@ -8,6 +8,7 @@ import { dateReducer, INIT_DATE } from '../../core/dateFilter';
 import { BarChartLine, Table, ExclamationTriangle, XLg } from '../icons';
 import type { AnalyticsState } from '../../hooks/useLogAnalytics';
 import type { AggregationResult, LogEntry, SeverityLevel } from '../../types/log.types';
+import { isErrorEntry } from '../../core/entryMetrics';
 
 const LazyChartsGrid = lazy(() => import('../dashboard/Charts'));
 
@@ -24,7 +25,7 @@ function reAggregate(entries: LogEntry[], base: AggregationResult): AggregationR
       const key = e.timestamp.toISOString().slice(0, 16);
       const b = tsMap.get(key) ?? { requests: 0, errors: 0 };
       b.requests++;
-      if (e.severity === 'ERROR' || e.severity === 'FATAL' || (e.status != null && e.status >= 400)) {
+      if (isErrorEntry(e)) {
         b.errors++;
       }
       tsMap.set(key, b);
@@ -57,7 +58,7 @@ function reAggregate(entries: LogEntry[], base: AggregationResult): AggregationR
     ...base,
     totalLines: entries.length,
     parsedLines: entries.length,
-    errorLines: entries.filter(e => e.severity === 'ERROR' || e.severity === 'FATAL').length,
+    errorLines: entries.filter(isErrorEntry).length,
     timeSeries,
     topIPs,
     statusDistribution,
@@ -124,7 +125,7 @@ export function MainPage({ state, processFile, reset }: Props) {
               branch it would sit outside of is always the one being drawn.
               Left where it was it belonged to no landmark at all. */}
           {(state.status === 'parsing' || state.status === 'sniffing') && (
-            <ProgressBar state={state} />
+            <ProgressBar state={state} onCancel={reset} />
           )}
 
           {hasData && (

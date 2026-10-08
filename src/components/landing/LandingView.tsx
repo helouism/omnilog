@@ -2,8 +2,8 @@ import { Dropzone } from '../uploader/Dropzone';
 import { Footer } from '../layout/Footer';
 
 const FEATURES: [string, string, string][] = [
-  ['Privacy', 'Zero egress', 'Log files are read locally via the browser File API and never sent anywhere. The Content Security Policy blocks all outbound connections involving your data.'],
-  ['Scale', '100 GB+ files', 'Read in 50 MB streaming chunks via a background Web Worker, keeping the UI at 60 FPS regardless of file size. Raw log strings are discarded after each chunk.'],
+  ['Privacy', 'Local processing', 'Log files are read locally via the browser File API and are not uploaded. The site may send aggregate page analytics, but your log contents stay in the browser.'],
+  ['Scale', 'Chunked processing', 'Files are read in 50 MB chunks via a background Web Worker. Practical limits depend on browser memory because detailed rows are retained for search and export.'],
   ['Detection', 'Auto-detect format', 'Confidence scoring on the first 1 MB identifies NGINX, Apache, UFW, and RFC 3164/5424 syslog, with a generic heuristic parser as fallback.'],
   ['Analysis', 'Search and filter', 'Virtual scrolling handles millions of rows. Filter by severity, date range, or full regex. Sort any column. Export the filtered view to CSV.'],
 ];
@@ -17,12 +17,12 @@ const FORMATS: [string, string, string][] = [
 ];
 
 const STEPS: [string, string][] = [
-  ['Drop your file', 'Drag a log file onto the drop zone, or click to browse. Any format, any size. Files never leave your computer.'],
+  ['Drop your file', 'Drag a log file onto the drop zone, or click to browse. Files are processed locally and are not uploaded.'],
   ['Format detection', 'OmniLog reads the first 1 MB and scores it against each parser. The highest-confidence format wins.'],
   ['Stream and explore', 'The file is processed in 50 MB chunks on a background thread. Charts and the table fill in progressively as you search.'],
 ];
 
-const TRUST = ['Zero egress', 'Auto-detects format', '100 GB+ files', 'No account'];
+const TRUST = ['Local processing', 'Auto-detects format', 'Chunked parsing', 'No account'];
 
 function Hero({ onFile }: { onFile: (file: File) => void }) {
   return (

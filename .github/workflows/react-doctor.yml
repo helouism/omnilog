@@ -42,6 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # React Doctor compares the PR with main; shallow history prevents
+          # it from finding the merge base and produces misleading findings.
+          fetch-depth: 0
 
       # Pinned by SHA, not the mutable @v2 tag: this job holds
       # pull-requests: write and issues: write, and a floating major tag

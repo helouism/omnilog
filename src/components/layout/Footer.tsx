@@ -20,7 +20,7 @@ export function Footer() {
       style={{ borderTop: '1px solid var(--ol-border)' }}
     >
       <span style={{ fontSize: 'var(--ol-fs-xs)', color: 'var(--ol-text-faint)' }}>
-        OmniLog — log analytics that never leaves your browser.
+        OmniLog — log contents stay in your browser.
       </span>
       <div className="d-flex flex-wrap gap-4">
         {FOOTER_LINKS.map(({ label, to }) => (

@@ -55,8 +55,9 @@ export function ContactUs() {
                 color: 'var(--ol-text-dim)',
               }}
             >
-              OmniLog is fully client-side. Your log files never leave your browser —
-              there is no backend server, no database, and no upload endpoint.
+              OmniLog processes logs client-side. Your log contents are not uploaded —
+              there is no backend database or upload endpoint. The site may still send
+              aggregate page analytics, as described in the Privacy Policy.
               If you want to verify this, read our <Link to="/privacy">Privacy Policy</Link>.
             </p>
           </section>

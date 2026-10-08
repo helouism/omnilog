@@ -15,6 +15,7 @@ import { parseApacheLine, scoreApache } from '../parsers/apache.parser';
 import { parseUfwLine, scoreUfw } from '../parsers/ufw.parser';
 import { parseSyslogLine, scoreSyslog } from '../parsers/syslog.parser';
 import { parseGenericLine } from '../parsers/generic.parser';
+import { isErrorEntry } from '../entryMetrics';
 
 const CHUNK_SIZE = 50 * 1024 * 1024; // 50 MB
 const SAMPLE_SIZE = 1 * 1024 * 1024; // 1 MB
@@ -65,6 +66,7 @@ function buildAggregation(
   confidence: number,
   totalLines: number,
   errorLines: number,
+  includeEntries = true,
 ): AggregationResult {
   const tsMap = new Map<string, { requests: number; errors: number }>();
   const ipMap = new Map<string, number>();
@@ -76,7 +78,7 @@ function buildAggregation(
       const bucket = minuteBucket(e.timestamp);
       const prev = tsMap.get(bucket) ?? { requests: 0, errors: 0 };
       prev.requests++;
-      if (e.severity === 'ERROR' || e.severity === 'FATAL' || (e.status != null && e.status >= 500)) {
+      if (isErrorEntry(e)) {
         prev.errors++;
       }
       tsMap.set(bucket, prev);
@@ -118,7 +120,7 @@ function buildAggregation(
     topIPs,
     statusDistribution,
     severityDistribution,
-    entries,
+    entries: includeEntries ? entries : [],
   };
 }
 
@@ -126,7 +128,7 @@ function buildAggregation(
 
 async function processFile(file: File): Promise<void> {
   const totalBytes = file.size;
-  let processedBytes = 0;
+  let processedBytes: number;
   let lineId = 0;
   let totalLines = 0;
   let errorLines = 0;
@@ -184,7 +186,9 @@ async function processFile(file: File): Promise<void> {
     // Emit partial aggregation periodically for progressive dashboard
     chunkIndex++;
     if (chunkIndex % PARTIAL_EMIT_INTERVAL === 0) {
-      const partial = buildAggregation([...allEntries], format, confidence, totalLines, errorLines);
+      // Charts need aggregate values, not another structured clone of every raw
+      // row. The final message includes entries for the searchable table.
+      const partial = buildAggregation(allEntries, format, confidence, totalLines, errorLines, false);
       self.postMessage({ type: 'partial', aggregation: partial });
     }
 
@@ -196,8 +200,12 @@ async function processFile(file: File): Promise<void> {
   if (remainder.trim()) {
     const raw = remainder.trimEnd();
     totalLines++;
-    const entry = parseLine(raw, lineId++, format);
-    allEntries.push(entry);
+    const entry = parseLine(raw, lineId, format);
+    if (entry.timestamp === null && entry.ip === null && entry.message === null) {
+      errorLines++;
+    } else {
+      allEntries.push(entry);
+    }
   }
 
   const final = buildAggregation(allEntries, format, confidence, totalLines, errorLines);

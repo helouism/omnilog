@@ -78,6 +78,6 @@ export function parseGenericLine(raw: string, id: number): LogEntry {
   };
 }
 
-export function scoreGeneric(_sample: string): number {
+export function scoreGeneric(): number {
   return 0; // Always fallback — never wins confidence scoring
 }
