@@ -31,13 +31,22 @@ function parseSyslogDate(raw: string): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
+// RFC 5424 §6.2.3: TIMESTAMP may be NILVALUE ("-") when the sender cannot
+// provide a time. `new Date("-")` yields an Invalid Date object (truthy), which
+// later aborts the whole file in minuteBucket(), so treat it as absent.
+function parseRfc5424Timestamp(raw: string): Date | null {
+  if (raw === '-') return null;
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 export function parseSyslogLine(raw: string, id: number): LogEntry | null {
   let m = RFC5424.exec(raw);
   if (m) {
     const { severity } = decodePri(parseInt(m[1]));
     return {
       id, raw,
-      timestamp: new Date(m[3]),
+      timestamp: parseRfc5424Timestamp(m[3]),
       severity,
       ip: null, method: null, path: null, status: null, bytes: null,
       referer: null, userAgent: null,

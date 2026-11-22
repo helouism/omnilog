@@ -1,6 +1,13 @@
 import type { AggregationResult, LogEntry, SeverityLevel } from '../types/log.types';
 import { isErrorEntry } from './entryMetrics';
 
+// A parser may hand back an Invalid Date (e.g. an RFC 5424 NILVALUE timestamp).
+// Calling toISOString() on it throws RangeError and would abort the whole file,
+// so treat any non-real date as absent and keep the entry.
+export function isUsableTimestamp(ts: Date | null): ts is Date {
+  return ts instanceof Date && !Number.isNaN(ts.getTime());
+}
+
 /** Rebuild dashboard aggregates after a date-range filter is applied. */
 export function reAggregate(entries: LogEntry[], base: AggregationResult): AggregationResult {
   const tsMap = new Map<string, { requests: number; errors: number }>();
@@ -9,7 +16,7 @@ export function reAggregate(entries: LogEntry[], base: AggregationResult): Aggre
   const severityMap = new Map<SeverityLevel, number>();
 
   for (const entry of entries) {
-    if (entry.timestamp) {
+    if (isUsableTimestamp(entry.timestamp)) {
       const key = entry.timestamp.toISOString().slice(0, 16);
       const bucket = tsMap.get(key) ?? { requests: 0, errors: 0 };
       bucket.requests++;
