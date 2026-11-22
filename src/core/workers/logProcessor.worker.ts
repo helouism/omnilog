@@ -16,6 +16,7 @@ import { parseUfwLine, scoreUfw } from '../parsers/ufw.parser';
 import { parseSyslogLine, scoreSyslog } from '../parsers/syslog.parser';
 import { parseGenericLine } from '../parsers/generic.parser';
 import { isErrorEntry } from '../entryMetrics';
+import { isUsableTimestamp } from '../aggregation';
 
 const CHUNK_SIZE = 50 * 1024 * 1024; // 50 MB
 const SAMPLE_SIZE = 1 * 1024 * 1024; // 1 MB
@@ -74,7 +75,7 @@ function buildAggregation(
   const severityMap = new Map<SeverityLevel, number>();
 
   for (const e of entries) {
-    if (e.timestamp) {
+    if (isUsableTimestamp(e.timestamp)) {
       const bucket = minuteBucket(e.timestamp);
       const prev = tsMap.get(bucket) ?? { requests: 0, errors: 0 };
       prev.requests++;
